@@ -1,3 +1,6 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Hovedopgave.Data;
 namespace Hovedopgave
 {
     public class Program
@@ -5,6 +8,8 @@ namespace Hovedopgave
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddDbContext<HovedopgaveContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("HovedopgaveContext") ?? throw new InvalidOperationException("Connection string 'HovedopgaveContext' not found.")));
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
