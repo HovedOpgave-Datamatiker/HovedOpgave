@@ -24,5 +24,6 @@ namespace Hovedopgave.Data
             // Apply seed data
             SeedData.Seed(modelBuilder);
         }
+        public DbSet<Hovedopgave.Models.Station> Station { get; set; } = default!;
     }
 }
