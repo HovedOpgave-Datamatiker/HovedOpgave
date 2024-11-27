@@ -7,27 +7,25 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Hovedopgave.Data;
 using Hovedopgave.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Hovedopgave.Controllers
 {
-    public class TicketsController : Controller
+    public class UsersController : Controller
     {
         private readonly HovedopgaveContext _context;
 
-        public TicketsController(HovedopgaveContext context)
+        public UsersController(HovedopgaveContext context)
         {
             _context = context;
         }
 
-        [Authorize]
-        // GET: Tickets
+        // GET: Users
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Ticket.ToListAsync());
+            return View(await _context.User.ToListAsync());
         }
 
-        // GET: Tickets/Details/5
+        // GET: Users/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -35,39 +33,39 @@ namespace Hovedopgave.Controllers
                 return NotFound();
             }
 
-            var ticket = await _context.Ticket
+            var user = await _context.User
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (ticket == null)
+            if (user == null)
             {
                 return NotFound();
             }
 
-            return View(ticket);
+            return View(user);
         }
 
-        // GET: Tickets/Create
+        // GET: Users/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Tickets/Create
+        // POST: Users/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Description,IsFinished,Created,LastUpdated,Priority")] Ticket ticket)
+        public async Task<IActionResult> Create([Bind("Id,Username,Password,Role")] User user)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(ticket);
+                _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(ticket);
+            return View(user);
         }
 
-        // GET: Tickets/Edit/5
+        // GET: Users/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -75,22 +73,22 @@ namespace Hovedopgave.Controllers
                 return NotFound();
             }
 
-            var ticket = await _context.Ticket.FindAsync(id);
-            if (ticket == null)
+            var user = await _context.User.FindAsync(id);
+            if (user == null)
             {
                 return NotFound();
             }
-            return View(ticket);
+            return View(user);
         }
 
-        // POST: Tickets/Edit/5
+        // POST: Users/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Description,IsFinished,Created,LastUpdated,Priority")] Ticket ticket)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Username,Password,Role")] User user)
         {
-            if (id != ticket.Id)
+            if (id != user.Id)
             {
                 return NotFound();
             }
@@ -99,12 +97,12 @@ namespace Hovedopgave.Controllers
             {
                 try
                 {
-                    _context.Update(ticket);
+                    _context.Update(user);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TicketExists(ticket.Id))
+                    if (!UserExists(user.Id))
                     {
                         return NotFound();
                     }
@@ -115,10 +113,10 @@ namespace Hovedopgave.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(ticket);
+            return View(user);
         }
 
-        // GET: Tickets/Delete/5
+        // GET: Users/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -126,34 +124,34 @@ namespace Hovedopgave.Controllers
                 return NotFound();
             }
 
-            var ticket = await _context.Ticket
+            var user = await _context.User
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (ticket == null)
+            if (user == null)
             {
                 return NotFound();
             }
 
-            return View(ticket);
+            return View(user);
         }
 
-        // POST: Tickets/Delete/5
+        // POST: Users/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var ticket = await _context.Ticket.FindAsync(id);
-            if (ticket != null)
+            var user = await _context.User.FindAsync(id);
+            if (user != null)
             {
-                _context.Ticket.Remove(ticket);
+                _context.User.Remove(user);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool TicketExists(int id)
+        private bool UserExists(int id)
         {
-            return _context.Ticket.Any(e => e.Id == id);
+            return _context.User.Any(e => e.Id == id);
         }
     }
 }
