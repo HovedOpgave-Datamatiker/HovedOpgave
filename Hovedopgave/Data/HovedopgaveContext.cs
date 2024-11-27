@@ -16,5 +16,13 @@ namespace Hovedopgave.Data
 
         public DbSet<Hovedopgave.Models.Ticket> Ticket { get; set; } = default!;
         public DbSet<Hovedopgave.Models.User> User { get; set; } = default!;
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Apply seed data
+            SeedData.Seed(modelBuilder);
+        }
     }
 }
