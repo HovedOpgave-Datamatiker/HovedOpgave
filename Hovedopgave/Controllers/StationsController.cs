@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Hovedopgave.Controllers
 {
+    [Authorize]
     public class StationsController : Controller
     {
         private readonly HovedopgaveContext _context;
@@ -21,7 +22,6 @@ namespace Hovedopgave.Controllers
         }
 
         // GET: Stations
-        [Authorize]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Station.ToListAsync());

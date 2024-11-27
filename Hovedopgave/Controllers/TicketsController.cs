@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Hovedopgave.Controllers
 {
+    [Authorize]
     public class TicketsController : Controller
     {
         private readonly HovedopgaveContext _context;
@@ -20,11 +21,22 @@ namespace Hovedopgave.Controllers
             _context = context;
         }
 
-        [Authorize]
         // GET: Tickets
         public async Task<IActionResult> Index()
         {
             return View(await _context.Ticket.ToListAsync());
+        }
+
+        // GET: Open Tickets
+        public async Task<IActionResult> OpenTickets()
+        {
+            return View(await _context.Ticket.Where(t => t.IsFinished == false).ToListAsync());
+        }
+
+        // GET: Closed Tickets
+        public async Task<IActionResult> ClosedTickets()
+        {
+            return View(await _context.Ticket.Where(t => t.IsFinished == true).ToListAsync());
         }
 
         // GET: Tickets/Details/5
