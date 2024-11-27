@@ -30,6 +30,9 @@
             <th>
                 Options
             </th>
+            <th>
+                Change status
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -56,7 +59,15 @@
                     <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                     <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
                 </td>
+                <td>
+                    <a asp-action="ChangeStatus" asp-route-id="@item.Id">
+                        <button>Change status</button>
+                    </a>
+                </td>
             </tr>
         }
     </tbody>
 </table>
+
+
+

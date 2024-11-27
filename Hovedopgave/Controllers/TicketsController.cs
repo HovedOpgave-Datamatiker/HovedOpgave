@@ -155,5 +155,25 @@ namespace Hovedopgave.Controllers
         {
             return _context.Ticket.Any(e => e.Id == id);
         }
+
+        public async Task<IActionResult> ChangeStatus(int id)
+        {
+            var ticket = await _context.Ticket.FindAsync(id);
+            if (ticket != null)
+            {
+                if(ticket.IsFinished)
+                {
+                    ticket.IsFinished = false;
+                }
+                else
+                {
+                    ticket.IsFinished = true;
+                }
+                ticket.LastUpdated = DateTime.Now;
+                _context.Update(ticket);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
