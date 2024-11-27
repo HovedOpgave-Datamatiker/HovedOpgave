@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Hovedopgave.Data;
 using Hovedopgave.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Hovedopgave.Controllers
 {
@@ -19,6 +20,7 @@ namespace Hovedopgave.Controllers
             _context = context;
         }
 
+        [Authorize]
         // GET: Tickets
         public async Task<IActionResult> Index()
         {
