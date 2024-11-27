@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Hovedopgave.Data;
+using Microsoft.AspNetCore.Authentication.Cookies;
 namespace Hovedopgave
 {
     public class Program
@@ -13,6 +14,9 @@ namespace Hovedopgave
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
+
 
             var app = builder.Build();
 
@@ -28,6 +32,8 @@ namespace Hovedopgave
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

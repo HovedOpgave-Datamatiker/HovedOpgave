@@ -15,5 +15,6 @@ namespace Hovedopgave.Data
         }
 
         public DbSet<Hovedopgave.Models.Ticket> Ticket { get; set; } = default!;
+        public DbSet<Hovedopgave.Models.User> User { get; set; } = default!;
     }
 }
