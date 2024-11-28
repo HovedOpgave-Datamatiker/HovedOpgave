@@ -21,16 +21,16 @@ namespace Hovedopgave.Controllers
             _context = context;
         }
 
-        // GET: Tickets
+        // GET: Open Tickets
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Ticket.ToListAsync());
+            return View(await _context.Ticket.Where(t => t.IsFinished == false).OrderByDescending(t => t.Priority).ToListAsync());
         }
 
-        // GET: Open Tickets
+        // GET: All Tickets
         public async Task<IActionResult> OpenTickets()
         {
-            return View(await _context.Ticket.Where(t => t.IsFinished == false).ToListAsync());
+            return View(await _context.Ticket.ToListAsync());
         }
 
         // GET: Closed Tickets
