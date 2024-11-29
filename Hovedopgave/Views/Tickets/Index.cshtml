@@ -4,10 +4,14 @@
     ViewData["Title"] = "Open Tickets";
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/ticketIndex.css" />
+}
+
 <h1>Tickets</h1>
 
 <p>
-    <button class="btn btn-primary" onclick="window.location.href = '/Tickets/Create'">Create New</button>
+    <button class="btn-primary" onclick="window.location.href = '/Tickets/Create'">Create New</button>
 </p>
 <table class="table">
     <thead>
@@ -61,7 +65,7 @@
                 </td>
                 <td>
                     <a asp-action="ChangeStatus" asp-route-id="@item.Id">
-                        <button class="btn btn-secondary">Change status</button>
+                        <button class="btn-secondary">Change status</button>
                     </a>
                 </td>
             </tr>
