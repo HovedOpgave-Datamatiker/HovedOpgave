@@ -47,6 +47,24 @@ namespace Hovedopgave.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Station");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            LocationX = 1.0,
+                            LocationY = 2.0,
+                            Name = "Station 1",
+                            Notes = "This is station 1"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            LocationX = 3.0,
+                            LocationY = 4.0,
+                            Name = "Station 2",
+                            Notes = "This is station 2"
+                        });
                 });
 
             modelBuilder.Entity("Hovedopgave.Models.Ticket", b =>
@@ -76,6 +94,17 @@ namespace Hovedopgave.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Ticket");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Created = new DateTime(2024, 12, 2, 11, 20, 29, 983, DateTimeKind.Local).AddTicks(5855),
+                            Description = "Ticket 1",
+                            IsFinished = false,
+                            LastUpdated = new DateTime(2024, 12, 2, 11, 20, 29, 983, DateTimeKind.Local).AddTicks(5904),
+                            Priority = 1
+                        });
                 });
 
             modelBuilder.Entity("Hovedopgave.Models.User", b =>
@@ -116,6 +145,20 @@ namespace Hovedopgave.Migrations
                             Password = "password123",
                             Role = "User",
                             Username = "user1"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Password = "password123",
+                            Role = "Felt",
+                            Username = "felt1"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Password = "password123",
+                            Role = "Kontor",
+                            Username = "kontor1"
                         });
                 });
 #pragma warning restore 612, 618
