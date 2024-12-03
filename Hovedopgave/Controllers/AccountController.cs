@@ -38,10 +38,11 @@ namespace Hovedopgave.Controllers
                 {
                     // Log the user in
                     var claims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Name, user.Username),
-                        new Claim(string.Empty, user.Role)
-                    };
+            {
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Role, user.Role),
+                
+            };
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
@@ -55,6 +56,7 @@ namespace Hovedopgave.Controllers
             }
             return View();
         }
+
 
         public IActionResult Logout()
         {

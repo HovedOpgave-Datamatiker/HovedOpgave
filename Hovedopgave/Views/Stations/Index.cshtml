@@ -1,13 +1,13 @@
 ﻿@model IEnumerable<Hovedopgave.Models.Station>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Stationer";
 }
 
-<h1>Stations</h1>
+<h1>Stationer</h1>
 
 <p>
-    <button class="btn btn-primary" onclick="window.location.href = '/Stations/Create'">Create New</button>
+    <button class="btn btn-primary" onclick="window.location.href = '/Stations/Create'">Opret ny</button>
 </p>
 <table class="table">
     <thead>
@@ -25,7 +25,7 @@
                 @Html.DisplayNameFor(model => model.Notes)
             </th>
             <th>
-                Options
+                Muligheder
             </th>
         </tr>
     </thead>
@@ -45,9 +45,9 @@
                 @Html.DisplayFor(modelItem => item.Notes)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.Id">Rediger</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Detaljer</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Slet</a>
             </td>
         </tr>
 }

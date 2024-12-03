@@ -1,10 +1,10 @@
 ﻿@model IEnumerable<Hovedopgave.Models.Ticket>
 
 @{
-    ViewData["Title"] = "Lukkede sager";
+    ViewData["Title"] = "Mine sager";
 }
 
-<h1>Lukkede sager</h1>
+<h1>Mine sager</h1>
 
 <table class="table">
     <thead>
@@ -28,7 +28,7 @@
                 Muligheder
             </th>
             <th>
-                Åben/Luk Sag
+                Åben/Luk sag
             </th>
         </tr>
     </thead>
@@ -43,7 +43,7 @@
                     @Html.DisplayFor(modelItem => item.Description)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Priority)
+                    @Html.DisplayFor(modelItem => item.PriorityDescription)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Created)
@@ -65,6 +65,7 @@
         }
     </tbody>
 </table>
+
 
 
 

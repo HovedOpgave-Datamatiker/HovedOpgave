@@ -4,9 +4,7 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
-
-<h4>Ticket</h4>
+<h1>Edit Ticket</h1>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -24,14 +22,14 @@
                 <span asp-validation-for="Priority" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input style="margin-top: 10px" type="submit" value="Gem" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <button accesskey="$0" class="btn btn-secondary" onclick="window.location.href = '/Tickets/Index'">Back to List</button>
+    <button style="margin-top: 10px" accesskey="$0" class="btn btn-secondary" onclick="window.location.href = '/Tickets/Index'">Tilbage til liste</button>
 </div>
 
 @section Scripts {
