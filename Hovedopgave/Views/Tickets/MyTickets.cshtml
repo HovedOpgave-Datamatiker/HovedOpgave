@@ -1,14 +1,11 @@
 ﻿@model IEnumerable<Hovedopgave.Models.Ticket>
 
 @{
-    ViewData["Title"] = "Open Tickets";
+    ViewData["Title"] = "My Tickets";
 }
 
-<h1>Tickets</h1>
+<h1>My Tickets</h1>
 
-<p>
-    <button class="btn btn-primary" onclick="window.location.href = '/Tickets/Create'">Create New</button>
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -46,7 +43,7 @@
                     @Html.DisplayFor(modelItem => item.Description)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Priority)
+                    @Html.DisplayFor(modelItem => item.PriorityDescription)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Created)

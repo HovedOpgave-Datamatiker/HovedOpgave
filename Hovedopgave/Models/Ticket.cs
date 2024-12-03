@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -24,11 +25,27 @@ namespace Hovedopgave.Models
 
         public User? User { get; set; }
 
+        // Constructor to set default values
         public Ticket()
         {
             IsFinished = false;
             Created = DateTime.Now;
             LastUpdated = DateTime.Now;
+        }
+
+        [NotMapped]
+        public string PriorityDescription
+        {
+            get
+            {
+                return Priority switch
+                {
+                    1 => "Low",
+                    2 => "Medium",
+                    3 => "High",
+                    _ => "Unknown"
+                };
+            }
         }
     }
 }

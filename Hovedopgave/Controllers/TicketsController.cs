@@ -25,7 +25,6 @@ namespace Hovedopgave.Controllers
         //GET: User Tickets
         public async Task<IActionResult> MyTickets()
         {
-            // Replace this with the actual logic to get the logged-in user's ID
             int currentUserId = _context.User.Where(U => U.Username == User.Identity.Name).FirstOrDefault().Id;
 
             return View(await _context.Ticket.Where(t => t.UserId == currentUserId).ToListAsync());
@@ -70,24 +69,27 @@ namespace Hovedopgave.Controllers
         // GET: Tickets/Create
         public IActionResult Create()
         {
+            ViewData["Users"] = new SelectList(_context.User, "Id", "Username");
             return View();
         }
 
         // POST: Tickets/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Description,IsFinished,Created,LastUpdated,Priority,UserId,User")] Ticket ticket)
+        public async Task<IActionResult> Create([Bind("Description,Priority,UserId")] Ticket ticket)
         {
             if (ModelState.IsValid)
             {
+                ticket.Created = DateTime.Now;
+                ticket.LastUpdated = DateTime.Now;
                 _context.Add(ticket);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["Users"] = new SelectList(_context.User, "Id", "Username", ticket.UserId);
             return View(ticket);
         }
+
 
         // GET: Tickets/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -183,7 +185,7 @@ namespace Hovedopgave.Controllers
             var ticket = await _context.Ticket.FindAsync(id);
             if (ticket != null)
             {
-                if(ticket.IsFinished)
+                if (ticket.IsFinished)
                 {
                     ticket.IsFinished = false;
                 }
