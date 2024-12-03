@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Hovedopgave.Data;
 using Hovedopgave.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace Hovedopgave.Controllers
 {
@@ -19,6 +20,15 @@ namespace Hovedopgave.Controllers
         public TicketsController(HovedopgaveContext context)
         {
             _context = context;
+        }
+
+        //GET: User Tickets
+        public async Task<IActionResult> MyTickets()
+        {
+            // Replace this with the actual logic to get the logged-in user's ID
+            int currentUserId = _context.User.Where(U => U.Username == User.Identity.Name).FirstOrDefault().Id;
+
+            return View(await _context.Ticket.Where(t => t.UserId == currentUserId).ToListAsync());
         }
 
         // GET: Open Tickets
@@ -68,7 +78,7 @@ namespace Hovedopgave.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Description,IsFinished,Created,LastUpdated,Priority")] Ticket ticket)
+        public async Task<IActionResult> Create([Bind("Id,Description,IsFinished,Created,LastUpdated,Priority,UserId,User")] Ticket ticket)
         {
             if (ModelState.IsValid)
             {

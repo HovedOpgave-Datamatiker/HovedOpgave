@@ -20,9 +20,9 @@ namespace Hovedopgave.Models
         public int Priority { get; set; }
 
         [ForeignKey("User")]
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
 
-        public User User { get; set; }
+        public User? User { get; set; }
 
         public Ticket()
         {
