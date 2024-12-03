@@ -8,16 +8,18 @@ namespace Hovedopgave.Models
     public class Ticket
     {
         public int Id { get; set; }
+        [DisplayName("Beskrivelse")]
         public string Description { get; set; }
 
-        [DisplayName("Ticket Status")]
+        [DisplayName("Sagens status")]
         public bool IsFinished { get; set; }
+        [DisplayName("Sag oprettet")]
         public DateTime Created { get; set; }
 
-        [DisplayName("Last Update")]
+        [DisplayName("Sag sidst redigeret")]
         public DateTime LastUpdated { get; set; }
 
-        [DisplayName("Ticket Priority")]
+        [DisplayName("Sag prioritet")]
         public int Priority { get; set; }
 
         [ForeignKey("User")]
@@ -40,10 +42,10 @@ namespace Hovedopgave.Models
             {
                 return Priority switch
                 {
-                    1 => "Low",
-                    2 => "Medium",
-                    3 => "High",
-                    _ => "Unknown"
+                    1 => "Lav",
+                    2 => "Middel",
+                    3 => "Høj",
+                    _ => "Ukendt"
                 };
             }
         }
