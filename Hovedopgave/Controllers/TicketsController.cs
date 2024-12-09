@@ -82,6 +82,7 @@ namespace Hovedopgave.Controllers
             {
                 ticket.Created = DateTime.Now;
                 ticket.LastUpdated = DateTime.Now;
+                ticket.CreatedBy = User.Identity.Name;
                 _context.Add(ticket);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

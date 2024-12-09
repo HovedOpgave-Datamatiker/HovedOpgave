@@ -21,6 +21,8 @@ namespace Hovedopgave.Models
 
         [DisplayName("Sag prioritet")]
         public int Priority { get; set; }
+        [DisplayName("Opretter af")]
+        public string? CreatedBy { get; set; }
 
         [ForeignKey("User")]
         public int? UserId { get; set; }
