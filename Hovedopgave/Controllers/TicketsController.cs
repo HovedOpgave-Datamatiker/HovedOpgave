@@ -124,6 +124,7 @@ namespace Hovedopgave.Controllers
             {
                 try
                 {
+                    ticket.LastUpdatedBy = User.Identity.Name;
                     _context.Update(ticket);
                     await _context.SaveChangesAsync();
                 }

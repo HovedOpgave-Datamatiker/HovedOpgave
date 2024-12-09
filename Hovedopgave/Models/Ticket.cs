@@ -21,8 +21,10 @@ namespace Hovedopgave.Models
 
         [DisplayName("Sag prioritet")]
         public int Priority { get; set; }
-        [DisplayName("Opretter af")]
+        [DisplayName("Oprettet af")]
         public string? CreatedBy { get; set; }
+        [DisplayName("Sidst redigeret af")]
+        public string? LastUpdatedBy { get; set; }
 
         [ForeignKey("User")]
         public int? UserId { get; set; }
