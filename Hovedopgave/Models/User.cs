@@ -20,7 +20,6 @@ namespace Hovedopgave.Models
         public string Password { get; set; }
         [DisplayName("Rolle")]
         public string Role { get; set; }
-
         public ICollection<Ticket> Tickets { get; set; }
 
         public User()

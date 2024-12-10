@@ -29,15 +29,18 @@ namespace Hovedopgave.Models
         [ForeignKey("User")]
         public int? UserId { get; set; }
 
-        public User? User { get; set; }
+        public ICollection<User> Users { get; set; }
 
-        // Constructor to set default values
         public Ticket()
         {
             IsFinished = false;
             Created = DateTime.Now;
             LastUpdated = DateTime.Now;
+            Users = new List<User>();
         }
+
+        [NotMapped]
+        public int[] SelectedUserIds { get; set; }
 
         [NotMapped]
         public string PriorityDescription

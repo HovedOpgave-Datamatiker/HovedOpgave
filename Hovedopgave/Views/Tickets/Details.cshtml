@@ -51,6 +51,18 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.LastUpdatedBy)
         </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Users)
+        </dt>
+        <dd class="col-sm-10">
+            <ul>
+                @foreach (var user in Model.Users)
+                {
+                    <li>@user.Initials</li>
+                }
+            </ul>
+        </dd>
     </dl>
 </div>
 <div>

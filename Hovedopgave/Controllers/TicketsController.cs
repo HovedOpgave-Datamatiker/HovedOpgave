@@ -57,6 +57,7 @@ namespace Hovedopgave.Controllers
             }
 
             var ticket = await _context.Ticket
+                .Include(t => t.Users)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (ticket == null)
             {
@@ -67,29 +68,41 @@ namespace Hovedopgave.Controllers
         }
 
         // GET: Tickets/Create
-        public IActionResult Create()
-        {
-            ViewData["Users"] = new SelectList(_context.User, "Id", "Username");
-            return View();
-        }
-
-        // POST: Tickets/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Description,Priority,UserId")] Ticket ticket)
+        public async Task<IActionResult> Create(Ticket ticket, int[] selectedUserIds)
         {
             if (ModelState.IsValid)
             {
-                ticket.Created = DateTime.Now;
-                ticket.LastUpdated = DateTime.Now;
-                ticket.CreatedBy = User.Identity.Name;
+                // Attach selected users
+                if (selectedUserIds != null)
+                {
+                    foreach (var userId in selectedUserIds)
+                    {
+                        var user = await _context.User.FindAsync(userId);
+                        if (user != null)
+                        {
+                            ticket.Users.Add(user);
+                        }
+                    }
+                }
+
                 _context.Add(ticket);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["Users"] = new SelectList(_context.User, "Id", "Username", ticket.UserId);
+
+            // If we reach here, return View with existing data
+            ViewBag.Users = new SelectList(_context.User, "Id", "FullName");
             return View(ticket);
         }
+
+        public IActionResult Create()
+        {
+            ViewBag.Users = new SelectList(_context.User, "Id", "FullName");
+            return View();
+        }
+
 
 
         // GET: Tickets/Edit/5

@@ -23,6 +23,9 @@ namespace Hovedopgave.Data
 
             // Apply seed data
             SeedData.Seed(modelBuilder);
+            modelBuilder.Entity<Ticket> ().HasMany(t => t.Users).WithMany(u => u.Tickets)
+                .UsingEntity(j => j.ToTable("TicketUser"));
+
         }
         public DbSet<Hovedopgave.Models.Station> Station { get; set; } = default!;
     }
