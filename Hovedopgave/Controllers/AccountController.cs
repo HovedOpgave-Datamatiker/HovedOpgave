@@ -39,7 +39,8 @@ namespace Hovedopgave.Controllers
                     // Log the user in
                     var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Name, user.FullName),
+                
                 new Claim(ClaimTypes.Role, user.Role),
                 
             };

@@ -13,28 +13,36 @@ namespace Hovedopgave.Data
                     Id = 1, // Manually specify the ID since seeding requires fixed primary keys
                     Username = "admin",
                     Password = "admin123", // Ideally, passwords should be hashed
-                    Role = "Admin"
+                    Role = "Admin",
+                    FullName = "Admin Adminsen",
+                    Initials = "AA"
                 },
                 new User
                 {
                     Id = 2,
                     Username = "user1",
                     Password = "password123",
-                    Role = "User"
+                    Role = "User",
+                    FullName = "User Useren",
+                    Initials = "UU"
                 },
                 new User
                 {
                     Id = 3,
                     Username = "felt1",
                     Password = "password123",
-                    Role = "Felt"
+                    Role = "Felt",
+                    FullName = "Felt Feltsen",
+                    Initials = "FF"
                 },
                 new User
                 {
                     Id = 4,
                     Username = "kontor1",
                     Password = "password123",
-                    Role = "Kontor"
+                    Role = "Kontor",
+                    FullName = "Kontor Kontorsen",
+                    Initials = "KK"
                 }
             );
 

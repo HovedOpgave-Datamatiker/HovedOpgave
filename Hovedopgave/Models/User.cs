@@ -12,6 +12,10 @@ namespace Hovedopgave.Models
         public int Id { get; set; }
         [DisplayName("Brugernavn")]
         public string Username { get; set; }
+        [DisplayName("Fulde Navn")]
+        public string? FullName { get; set; }
+        [DisplayName("Initialer")]
+        public string Initials { get; set; }
         [DisplayName("Kodeord")]
         public string Password { get; set; }
         [DisplayName("Rolle")]
