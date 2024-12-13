@@ -14,8 +14,11 @@ namespace Hovedopgave
 
             builder.Services.AddControllersWithViews();
 
-            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
-
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
+            {
+                // set Cookie expiration time
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+            });
 
             var app = builder.Build();
 

@@ -20,6 +20,8 @@ namespace Hovedopgave.Controllers
         //GET: User Tickets
         public async Task<IActionResult> MyTickets()
         {
+            TempData["Return"] = "MyTickets";
+
             int currentUserId = _context.User.Where(U => U.Username == User.Identity.Name).FirstOrDefault().Id;
 
             return View(await _context.Ticket.Where(t => t.UserId == currentUserId).ToListAsync());
@@ -28,18 +30,23 @@ namespace Hovedopgave.Controllers
         // GET: Open Tickets
         public async Task<IActionResult> Index()
         {
+            TempData["Return"] = "Index";
+
             return View(await _context.Ticket.Where(t => t.IsFinished == false).OrderByDescending(t => t.Priority).ToListAsync());
         }
 
         // GET: All Tickets
         public async Task<IActionResult> OpenTickets()
         {
+            TempData["Return"] = "Index";
+
             return View(await _context.Ticket.ToListAsync());
         }
 
         // GET: Closed Tickets
         public async Task<IActionResult> ClosedTickets()
         {
+            TempData["Return"] = "ClosedTickets";
             return View(await _context.Ticket.Where(t => t.IsFinished == true).ToListAsync());
         }
 
@@ -58,6 +65,12 @@ namespace Hovedopgave.Controllers
             {
                 return NotFound();
             }
+
+
+            ViewBag.Return = TempData["Return"];
+
+            TempData["Return"] = "Index";
+
 
             return View(ticket);
         }
