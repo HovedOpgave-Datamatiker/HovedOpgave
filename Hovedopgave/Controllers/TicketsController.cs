@@ -109,8 +109,6 @@ namespace Hovedopgave.Controllers
             return View();
         }
 
-
-
         // GET: Tickets/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -119,18 +117,25 @@ namespace Hovedopgave.Controllers
                 return NotFound();
             }
 
-            var ticket = await _context.Ticket.FindAsync(id);
+            var ticket = await _context.Ticket
+                .Include(t => t.Users)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
             if (ticket == null)
             {
                 return NotFound();
             }
+
+            ticket.SelectedUserIds = ticket.Users.Select(u => u.Id).ToArray();
+            ViewBag.Users = new SelectList(_context.User, "Id", "FullName");
+
             return View(ticket);
         }
 
         // POST: Tickets/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Description,IsFinished,Created,LastUpdated,Priority")] Ticket ticket)
+        public async Task<IActionResult> Edit(int id, Ticket ticket)
         {
             if (id != ticket.Id)
             {
@@ -141,8 +146,34 @@ namespace Hovedopgave.Controllers
             {
                 try
                 {
-                    ticket.LastUpdatedBy = User.Identity.Name;
-                    _context.Update(ticket);
+                    var ticketToUpdate = await _context.Ticket
+                        .Include(t => t.Users)
+                        .FirstOrDefaultAsync(t => t.Id == ticket.Id);
+
+                    if (ticketToUpdate == null)
+                    {
+                        return NotFound();
+                    }
+
+                    ticketToUpdate.Description = ticket.Description;
+                    ticketToUpdate.Priority = ticket.Priority;
+                    ticketToUpdate.LastUpdated = DateTime.Now;
+                    ticketToUpdate.CreatedBy = User.Identity.Name;
+
+                    ticketToUpdate.Users.Clear();
+                    if (ticket.SelectedUserIds != null)
+                    {
+                        foreach (var userId in ticket.SelectedUserIds)
+                        {
+                            var user = await _context.User.FindAsync(userId);
+                            if (user != null)
+                            {
+                                ticketToUpdate.Users.Add(user);
+                            }
+                        }
+                    }
+
+                    _context.Update(ticketToUpdate);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -158,6 +189,8 @@ namespace Hovedopgave.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewBag.Users = new SelectList(_context.User, "Id", "FullName");
             return View(ticket);
         }
 
