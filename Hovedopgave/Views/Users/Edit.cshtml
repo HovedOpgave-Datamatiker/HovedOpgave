@@ -1,12 +1,10 @@
 ﻿@model Hovedopgave.Models.User
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Rediger bruger";
 }
 
-<h1>Edit</h1>
-
-<h4>User</h4>
+<h1>Rediger bruger</h1>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -29,16 +27,28 @@
                 <span asp-validation-for="Role" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <label asp-for="Initials" class="control-label"></label>
+                <input asp-for="Initials" class="form-control" />
+                <span asp-validation-for="Initials" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FullName" class="control-label"></label>
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input style="margin-top: 10px" type="submit" value="Gem" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a class="btn btn-secondary" style="margin-top: 10px" asp-action="Index">Tilbage til liste</a>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

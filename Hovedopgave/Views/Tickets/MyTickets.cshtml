@@ -1,14 +1,11 @@
 ﻿@model IEnumerable<Hovedopgave.Models.Ticket>
 
 @{
-    ViewData["Title"] = "Åbne sager";
+    ViewData["Title"] = "Mine sager";
 }
 
-<h1>Åbne sager</h1>
+<h1>Mine sager</h1>
 
-<p>
-    <button class="btn btn-primary" onclick="window.location.href = '/Tickets/Create'">Opret ny</button>
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -31,7 +28,7 @@
                 Muligheder
             </th>
             <th>
-                Åben/Luk Sag
+                Åben/Luk sag
             </th>
         </tr>
     </thead>
@@ -47,7 +44,6 @@
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.PriorityDescription)
-
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Created)
@@ -69,6 +65,7 @@
         }
     </tbody>
 </table>
+
 
 
 

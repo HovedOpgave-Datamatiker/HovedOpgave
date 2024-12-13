@@ -32,17 +32,16 @@ namespace Hovedopgave.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Check if the user exists
                 var user = _context.User.FirstOrDefault(u => u.Username == model.Username && u.Password == model.Password);
                 if (user != null)
                 {
-                    // Log the user in
                     var claims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Name, user.Username),
-                        new Claim(string.Empty, user.Role)
-                    };
-
+            {
+                new Claim(ClaimTypes.Name, user.Username),
+                
+                new Claim(ClaimTypes.Role, user.Role),
+                
+            };
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 

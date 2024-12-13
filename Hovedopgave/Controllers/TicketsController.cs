@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Hovedopgave.Data;
@@ -11,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Hovedopgave.Controllers
 {
+    [Authorize]
     public class TicketsController : Controller
     {
         private readonly HovedopgaveContext _context;
@@ -20,11 +17,37 @@ namespace Hovedopgave.Controllers
             _context = context;
         }
 
-        [Authorize]
-        // GET: Tickets
+        //GET: User Tickets
+        public async Task<IActionResult> MyTickets()
+        {
+            TempData["Return"] = "MyTickets";
+
+            int currentUserId = _context.User.Where(U => U.Username == User.Identity.Name).FirstOrDefault().Id;
+
+            return View(await _context.Ticket.Where(t => t.UserId == currentUserId).ToListAsync());
+        }
+
+        // GET: Open Tickets
         public async Task<IActionResult> Index()
         {
+            TempData["Return"] = "Index";
+
+            return View(await _context.Ticket.Where(t => t.IsFinished == false).OrderByDescending(t => t.Priority).ToListAsync());
+        }
+
+        // GET: All Tickets
+        public async Task<IActionResult> OpenTickets()
+        {
+            TempData["Return"] = "Index";
+
             return View(await _context.Ticket.ToListAsync());
+        }
+
+        // GET: Closed Tickets
+        public async Task<IActionResult> ClosedTickets()
+        {
+            TempData["Return"] = "ClosedTickets";
+            return View(await _context.Ticket.Where(t => t.IsFinished == true).ToListAsync());
         }
 
         // GET: Tickets/Details/5
@@ -36,35 +59,54 @@ namespace Hovedopgave.Controllers
             }
 
             var ticket = await _context.Ticket
+                .Include(t => t.Users)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (ticket == null)
             {
                 return NotFound();
             }
 
+
+            ViewBag.Return = TempData["Return"];
+
+            TempData["Return"] = "Index";
+
+
             return View(ticket);
         }
 
         // GET: Tickets/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Tickets/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Description,IsFinished,Created,LastUpdated,Priority")] Ticket ticket)
+        public async Task<IActionResult> Create(Ticket ticket, int[] selectedUserIds)
         {
             if (ModelState.IsValid)
             {
+                if (selectedUserIds != null)
+                {
+                    foreach (var userId in selectedUserIds)
+                    {
+                        var user = await _context.User.FindAsync(userId);
+                        if (user != null)
+                        {
+                            ticket.Users.Add(user);
+                        }
+                    }
+                }
+
                 _context.Add(ticket);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewBag.Users = new SelectList(_context.User, "Id", "FullName");
             return View(ticket);
+        }
+
+        public IActionResult Create()
+        {
+            ViewBag.Users = new SelectList(_context.User, "Id", "FullName");
+            return View();
         }
 
         // GET: Tickets/Edit/5
@@ -75,20 +117,25 @@ namespace Hovedopgave.Controllers
                 return NotFound();
             }
 
-            var ticket = await _context.Ticket.FindAsync(id);
+            var ticket = await _context.Ticket
+                .Include(t => t.Users)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
             if (ticket == null)
             {
                 return NotFound();
             }
+
+            ticket.SelectedUserIds = ticket.Users.Select(u => u.Id).ToArray();
+            ViewBag.Users = new SelectList(_context.User, "Id", "FullName");
+
             return View(ticket);
         }
 
         // POST: Tickets/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Description,IsFinished,Created,LastUpdated,Priority")] Ticket ticket)
+        public async Task<IActionResult> Edit(int id, Ticket ticket)
         {
             if (id != ticket.Id)
             {
@@ -99,7 +146,34 @@ namespace Hovedopgave.Controllers
             {
                 try
                 {
-                    _context.Update(ticket);
+                    var ticketToUpdate = await _context.Ticket
+                        .Include(t => t.Users)
+                        .FirstOrDefaultAsync(t => t.Id == ticket.Id);
+
+                    if (ticketToUpdate == null)
+                    {
+                        return NotFound();
+                    }
+
+                    ticketToUpdate.Description = ticket.Description;
+                    ticketToUpdate.Priority = ticket.Priority;
+                    ticketToUpdate.LastUpdated = DateTime.Now;
+                    ticketToUpdate.CreatedBy = User.Identity.Name;
+
+                    ticketToUpdate.Users.Clear();
+                    if (ticket.SelectedUserIds != null)
+                    {
+                        foreach (var userId in ticket.SelectedUserIds)
+                        {
+                            var user = await _context.User.FindAsync(userId);
+                            if (user != null)
+                            {
+                                ticketToUpdate.Users.Add(user);
+                            }
+                        }
+                    }
+
+                    _context.Update(ticketToUpdate);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -115,6 +189,8 @@ namespace Hovedopgave.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewBag.Users = new SelectList(_context.User, "Id", "FullName");
             return View(ticket);
         }
 
@@ -154,6 +230,26 @@ namespace Hovedopgave.Controllers
         private bool TicketExists(int id)
         {
             return _context.Ticket.Any(e => e.Id == id);
+        }
+
+        public async Task<IActionResult> ChangeStatus(int id)
+        {
+            var ticket = await _context.Ticket.FindAsync(id);
+            if (ticket != null)
+            {
+                if (ticket.IsFinished)
+                {
+                    ticket.IsFinished = false;
+                }
+                else
+                {
+                    ticket.IsFinished = true;
+                }
+                ticket.LastUpdated = DateTime.Now;
+                _context.Update(ticket);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index));
         }
     }
 }

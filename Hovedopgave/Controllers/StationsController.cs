@@ -2,25 +2,27 @@
 using Microsoft.EntityFrameworkCore;
 using Hovedopgave.Data;
 using Hovedopgave.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Hovedopgave.Controllers
 {
-    public class UsersController : Controller
+    [Authorize]
+    public class StationsController : Controller
     {
         private readonly HovedopgaveContext _context;
 
-        public UsersController(HovedopgaveContext context)
+        public StationsController(HovedopgaveContext context)
         {
             _context = context;
         }
 
-        // GET: Users
+        // GET: Stations
         public async Task<IActionResult> Index()
         {
-            return View(await _context.User.ToListAsync());
+            return View(await _context.Station.ToListAsync());
         }
 
-        // GET: Users/Details/5
+        // GET: Stations/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -28,37 +30,37 @@ namespace Hovedopgave.Controllers
                 return NotFound();
             }
 
-            var user = await _context.User
+            var station = await _context.Station
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (user == null)
+            if (station == null)
             {
                 return NotFound();
             }
 
-            return View(user);
+            return View(station);
         }
 
-        // GET: Users/Create
+        // GET: Stations/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Users/Create
+        // POST: Stations/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Username,Password,Role")] User user)
+        public async Task<IActionResult> Create([Bind("Id,Name,LocationX,LocationY,Notes")] Station station)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(user);
+                _context.Add(station);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(user);
+            return View(station);
         }
 
-        // GET: Users/Edit/5
+        // GET: Stations/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -66,20 +68,20 @@ namespace Hovedopgave.Controllers
                 return NotFound();
             }
 
-            var user = await _context.User.FindAsync(id);
-            if (user == null)
+            var station = await _context.Station.FindAsync(id);
+            if (station == null)
             {
                 return NotFound();
             }
-            return View(user);
+            return View(station);
         }
 
-        // POST: Users/Edit/5
+        // POST: Stations/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Username,Password,Role")] User user)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,LocationX,LocationY,Notes")] Station station)
         {
-            if (id != user.Id)
+            if (id != station.Id)
             {
                 return NotFound();
             }
@@ -88,12 +90,12 @@ namespace Hovedopgave.Controllers
             {
                 try
                 {
-                    _context.Update(user);
+                    _context.Update(station);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!UserExists(user.Id))
+                    if (!StationExists(station.Id))
                     {
                         return NotFound();
                     }
@@ -104,10 +106,10 @@ namespace Hovedopgave.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(user);
+            return View(station);
         }
 
-        // GET: Users/Delete/5
+        // GET: Stations/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -115,34 +117,34 @@ namespace Hovedopgave.Controllers
                 return NotFound();
             }
 
-            var user = await _context.User
+            var station = await _context.Station
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (user == null)
+            if (station == null)
             {
                 return NotFound();
             }
 
-            return View(user);
+            return View(station);
         }
 
-        // POST: Users/Delete/5
+        // POST: Stations/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var user = await _context.User.FindAsync(id);
-            if (user != null)
+            var station = await _context.Station.FindAsync(id);
+            if (station != null)
             {
-                _context.User.Remove(user);
+                _context.Station.Remove(station);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool UserExists(int id)
+        private bool StationExists(int id)
         {
-            return _context.User.Any(e => e.Id == id);
+            return _context.Station.Any(e => e.Id == id);
         }
     }
 }
