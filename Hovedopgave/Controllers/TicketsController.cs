@@ -22,9 +22,16 @@ namespace Hovedopgave.Controllers
         {
             TempData["Return"] = "MyTickets";
 
-            int currentUserId = _context.User.Where(U => U.Username == User.Identity.Name).FirstOrDefault().Id;
+            int currentUserId = _context.User
+                .Where(u => u.Username == User.Identity.Name)
+                .Select(u => u.Id)
+                .FirstOrDefault();
 
-            return View(await _context.Ticket.Where(t => t.UserId == currentUserId).ToListAsync());
+            return View(await _context.Ticket
+                .Include(t => t.Station)
+                .Include(t => t.Users)
+                .Where(t => t.Users.Any(u => u.Id == currentUserId))
+                .ToListAsync());
         }
 
         // GET: Open Tickets
@@ -32,7 +39,11 @@ namespace Hovedopgave.Controllers
         {
             TempData["Return"] = "Index";
 
-            return View(await _context.Ticket.Where(t => t.IsFinished == false).OrderByDescending(t => t.Priority).ToListAsync());
+            return View(await _context.Ticket
+                .Include(t => t.Station)
+                .Where(t => t.IsFinished == false)
+                .OrderByDescending(t => t.Priority)
+                .ToListAsync());
         }
 
         // GET: All Tickets
@@ -47,7 +58,10 @@ namespace Hovedopgave.Controllers
         public async Task<IActionResult> ClosedTickets()
         {
             TempData["Return"] = "ClosedTickets";
-            return View(await _context.Ticket.Where(t => t.IsFinished == true).ToListAsync());
+            return View(await _context.Ticket
+                .Include(t => t.Station)
+                .Where(t => t.IsFinished == true)
+                .ToListAsync());
         }
 
         // GET: Tickets/Details/5
@@ -60,6 +74,7 @@ namespace Hovedopgave.Controllers
 
             var ticket = await _context.Ticket
                 .Include(t => t.Users)
+                .Include(t => t.Station)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (ticket == null)
             {
@@ -78,7 +93,7 @@ namespace Hovedopgave.Controllers
         // GET: Tickets/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Ticket ticket, int[] selectedUserIds)
+        public async Task<IActionResult> Create(Ticket ticket, int[] selectedUserIds, int selectedStationId)
         {
             if (ModelState.IsValid)
             {
@@ -90,9 +105,21 @@ namespace Hovedopgave.Controllers
                         if (user != null)
                         {
                             ticket.Users.Add(user);
+                            //ticket.UserId = userId;
                         }
                     }
                 }
+
+                
+
+                //if(selectedStationId != null)
+                //{
+                //    var station = await _context.Station.FindAsync(selectedStationId);
+                //    if(station != null)
+                //    {
+                //        ticket.Station = await _context.Station.FindAsync(ticket.StationId);
+                //    }
+                //}
 
                 _context.Add(ticket);
                 await _context.SaveChangesAsync();
@@ -106,6 +133,7 @@ namespace Hovedopgave.Controllers
         public IActionResult Create()
         {
             ViewBag.Users = new SelectList(_context.User, "Id", "FullName");
+            ViewBag.Stations = new SelectList(_context.Station, "Id", "Name");
             return View();
         }
 

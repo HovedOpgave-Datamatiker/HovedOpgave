@@ -10,7 +10,7 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.IsFinished)
+                @Html.DisplayNameFor(model => model.Station.Name)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Description)
@@ -37,7 +37,7 @@
         {
             <tr>
                 <td>
-                    @(item.IsFinished ? "Lukket" : "Åben")
+                    @Html.DisplayFor(modelItem => item.Station.Name)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Description)

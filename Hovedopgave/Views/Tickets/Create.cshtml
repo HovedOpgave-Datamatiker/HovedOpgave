@@ -34,6 +34,11 @@
                 <select asp-for="SelectedUserIds" class="form-control" asp-items="ViewBag.Users" multiple="multiple"></select>
             </div>
 
+            <div class="form-group">
+                <label class="control-label">Vælg Station</label>
+                <select asp-for="StationId" class="form-control" asp-items="ViewBag.Stations"></select>
+            </div>
+
 
             <div style="margin-top: 10px" class="form-group">
                 <input type="submit" value="Opret" class="btn btn-primary" />
