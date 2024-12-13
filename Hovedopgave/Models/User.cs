@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -8,7 +7,7 @@ namespace Hovedopgave.Models
     public class User
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // Specifies auto-increment
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         [DisplayName("Brugernavn")]
         public string Username { get; set; }

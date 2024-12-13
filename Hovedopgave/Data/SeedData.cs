@@ -10,9 +10,9 @@ namespace Hovedopgave.Data
             modelBuilder.Entity<User>().HasData(
                 new User
                 {
-                    Id = 1, // Manually specify the ID since seeding requires fixed primary keys
+                    Id = 1,
                     Username = "admin",
-                    Password = "admin123", // Ideally, passwords should be hashed
+                    Password = "admin123",
                     Role = "Admin",
                     FullName = "Admin Adminsen",
                     Initials = "AA"

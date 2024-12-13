@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Hovedopgave.Data;
 using Hovedopgave.Models;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
 
 namespace Hovedopgave.Controllers
 {
@@ -74,7 +69,6 @@ namespace Hovedopgave.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Attach selected users
                 if (selectedUserIds != null)
                 {
                     foreach (var userId in selectedUserIds)
@@ -92,7 +86,6 @@ namespace Hovedopgave.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // If we reach here, return View with existing data
             ViewBag.Users = new SelectList(_context.User, "Id", "FullName");
             return View(ticket);
         }
@@ -122,8 +115,6 @@ namespace Hovedopgave.Controllers
         }
 
         // POST: Tickets/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Description,IsFinished,Created,LastUpdated,Priority")] Ticket ticket)
