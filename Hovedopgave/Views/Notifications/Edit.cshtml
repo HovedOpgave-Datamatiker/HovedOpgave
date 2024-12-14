@@ -10,6 +10,7 @@
     <div class="col-md-4">
         <form asp-action="Edit" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="UserId" />
 
@@ -21,11 +22,10 @@
             <div class="form-group" id="frequencyGroup">
                 <label asp-for="Frequency" class="control-label"></label>
                 <select asp-for="Frequency" class="form-control">
-                    <option value="Always">Altid (ved ny sag)</option>
-                    <option value="OnceADay">En gang om dagen (kl. 9.00)</option>
-                    <option value="OnceAWeek">En gang om ugen</option>
+                    <option value="0">Altid (ved ny sag)</option>
+                    <option value="1">En gang om dagen (kl. 9.00)</option>
+                    <option value="2">En gang om ugen</option>
                 </select>
-                <span asp-validation-for="Frequency" class="text-danger"></span>
             </div>
 
             <div class="form-group">
@@ -34,7 +34,6 @@
         </form>
     </div>
 </div>
-
 <div>
     <button style="margin-top: 10px" class="btn btn-secondary" onclick="window.location.href = '/'">Tilbage</button>
 </div>

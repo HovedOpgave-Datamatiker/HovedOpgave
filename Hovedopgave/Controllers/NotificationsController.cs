@@ -40,7 +40,6 @@ namespace Hovedopgave.Controllers
                     EmailNotificationsEnabled = false,
                     Frequency = NotificationFrequency.Always
                 };
-
                 _context.NotificationSetting.Add(setting);
                 await _context.SaveChangesAsync();
             }
@@ -70,25 +69,11 @@ namespace Hovedopgave.Controllers
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    setting.EmailNotificationsEnabled = postedSetting.EmailNotificationsEnabled;
-                    setting.Frequency = postedSetting.Frequency;
+                setting.EmailNotificationsEnabled = postedSetting.EmailNotificationsEnabled;
+                setting.Frequency = postedSetting.Frequency;
 
-                    _context.Update(setting);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!NotificationSettingExists(setting.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                _context.Update(setting);
+                await _context.SaveChangesAsync();
 
                 return RedirectToAction(nameof(Edit));
             }
