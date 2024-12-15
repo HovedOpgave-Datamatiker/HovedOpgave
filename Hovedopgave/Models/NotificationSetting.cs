@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Hovedopgave.Models
 {
@@ -17,10 +18,11 @@ namespace Hovedopgave.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        // Foreign key to User
         [ForeignKey("User")]
         public int UserId { get; set; }
-        public User User { get; set; }
+
+        [BindNever]
+        public User? User { get; set; }
 
         [DisplayName("Modtag Email Notifikationer")]
         public bool EmailNotificationsEnabled { get; set; }

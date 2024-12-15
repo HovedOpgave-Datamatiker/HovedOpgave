@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Hovedopgave.Data;
 using Hovedopgave.Models;
@@ -21,8 +19,14 @@ namespace Hovedopgave.Controllers
         // GET: Notifications/Edit
         public async Task<IActionResult> Edit()
         {
+            var username = User.Identity?.Name;
+            if (string.IsNullOrEmpty(username))
+            {
+                return Unauthorized();
+            }
+
             var currentUser = await _context.User
-                .FirstOrDefaultAsync(u => u.FullName == User.Identity.Name);
+                .FirstOrDefaultAsync(u => u.Username == username);
 
             if (currentUser == null)
             {
@@ -47,12 +51,19 @@ namespace Hovedopgave.Controllers
             return View(setting);
         }
 
+        // POST: Notifications/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(NotificationSetting postedSetting)
+        public async Task<IActionResult> Edit([Bind("Id,EmailNotificationsEnabled,Frequency")] NotificationSetting postedSetting)
         {
+            var username = User.Identity?.Name;
+            if (string.IsNullOrEmpty(username))
+            {
+                return Unauthorized();
+            }
+
             var currentUser = await _context.User
-                .FirstOrDefaultAsync(u => u.FullName == User.Identity.Name);
+                .FirstOrDefaultAsync(u => u.Username == username);
 
             if (currentUser == null)
             {
@@ -67,23 +78,18 @@ namespace Hovedopgave.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                setting.EmailNotificationsEnabled = postedSetting.EmailNotificationsEnabled;
-                setting.Frequency = postedSetting.Frequency;
-
-                _context.Update(setting);
-                await _context.SaveChangesAsync();
-
-                return RedirectToAction(nameof(Edit));
+                return View(setting);
             }
 
-            return View(setting);
-        }
+            setting.EmailNotificationsEnabled = postedSetting.EmailNotificationsEnabled;
+            setting.Frequency = postedSetting.Frequency;
 
-        private bool NotificationSettingExists(int id)
-        {
-            return _context.NotificationSetting.Any(e => e.Id == id);
+            _context.Update(setting);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Edit));
         }
     }
 }
