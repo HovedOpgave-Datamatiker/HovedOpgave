@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Hovedopgave.Data;
 using Hovedopgave.Models;
 using Microsoft.AspNetCore.Authorization;
+using Hovedopgave.Services;
 
 namespace Hovedopgave.Controllers
 {
@@ -11,10 +12,12 @@ namespace Hovedopgave.Controllers
     public class TicketsController : Controller
     {
         private readonly HovedopgaveContext _context;
+        private readonly NotificationMailer _mailer;
 
-        public TicketsController(HovedopgaveContext context)
+        public TicketsController(HovedopgaveContext context, NotificationMailer mailer)
         {
             _context = context;
+            _mailer = mailer;
         }
 
         //GET: User Tickets
@@ -39,7 +42,6 @@ namespace Hovedopgave.Controllers
         public async Task<IActionResult> OpenTickets()
         {
             TempData["Return"] = "Index";
-
             return View(await _context.Ticket.ToListAsync());
         }
 
@@ -66,11 +68,8 @@ namespace Hovedopgave.Controllers
                 return NotFound();
             }
 
-
             ViewBag.Return = TempData["Return"];
-
             TempData["Return"] = "Index";
-
 
             return View(ticket);
         }
@@ -96,6 +95,10 @@ namespace Hovedopgave.Controllers
 
                 _context.Add(ticket);
                 await _context.SaveChangesAsync();
+
+                // Notify Users
+                await NotifyUsersAboutTicketCreation(ticket);
+
                 return RedirectToAction(nameof(Index));
             }
 
@@ -175,6 +178,9 @@ namespace Hovedopgave.Controllers
 
                     _context.Update(ticketToUpdate);
                     await _context.SaveChangesAsync();
+
+                    // Notify users update
+                    await NotifyUsersAboutTicketUpdate(ticketToUpdate);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -237,19 +243,46 @@ namespace Hovedopgave.Controllers
             var ticket = await _context.Ticket.FindAsync(id);
             if (ticket != null)
             {
-                if (ticket.IsFinished)
-                {
-                    ticket.IsFinished = false;
-                }
-                else
-                {
-                    ticket.IsFinished = true;
-                }
+                ticket.IsFinished = !ticket.IsFinished;
                 ticket.LastUpdated = DateTime.Now;
                 _context.Update(ticket);
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
+        }
+
+        private async Task NotifyUsersAboutTicketCreation(Ticket ticket)
+        {
+            _mailer.ClearRecipients();
+
+            var assignedUsers = ticket.Users.ToList();
+            foreach (var user in assignedUsers)
+            {
+                var setting = await _context.NotificationSetting.FirstOrDefaultAsync(n => n.UserId == user.Id);
+                if (setting != null && setting.EmailNotificationsEnabled && setting.Frequency == NotificationFrequency.Always)
+                {
+                    _mailer.AddRecipient(user.Email);
+                }
+            }
+
+            _mailer.SendTicketCreatedNotification(ticket);
+        }
+
+        private async Task NotifyUsersAboutTicketUpdate(Ticket ticket)
+        {
+            _mailer.ClearRecipients();
+
+            var assignedUsers = ticket.Users.ToList();
+            foreach (var user in assignedUsers)
+            {
+                var setting = await _context.NotificationSetting.FirstOrDefaultAsync(n => n.UserId == user.Id);
+                if (setting != null && setting.EmailNotificationsEnabled && setting.Frequency == NotificationFrequency.Always)
+                {
+                    _mailer.AddRecipient(user.Email);
+                }
+            }
+
+            _mailer.SendTicketUpdatedNotification(ticket);
         }
     }
 }

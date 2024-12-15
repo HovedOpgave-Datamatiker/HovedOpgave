@@ -15,7 +15,8 @@ namespace Hovedopgave.Data
                     Password = "admin123",
                     Role = "Admin",
                     FullName = "Admin Adminsen",
-                    Initials = "AA"
+                    Initials = "AA",
+                    Email = "admin@admin.dk"
                 },
                 new User
                 {
@@ -24,7 +25,8 @@ namespace Hovedopgave.Data
                     Password = "password123",
                     Role = "User",
                     FullName = "User Useren",
-                    Initials = "UU"
+                    Initials = "UU",
+                    Email = "user@user.dk"
                 },
                 new User
                 {
@@ -33,7 +35,8 @@ namespace Hovedopgave.Data
                     Password = "password123",
                     Role = "Felt",
                     FullName = "Felt Feltsen",
-                    Initials = "FF"
+                    Initials = "FF",
+                    Email = "felt@felt.dk"
                 },
                 new User
                 {
@@ -42,7 +45,8 @@ namespace Hovedopgave.Data
                     Password = "password123",
                     Role = "Kontor",
                     FullName = "Kontor Kontorsen",
-                    Initials = "KK"
+                    Initials = "KK",
+                    Email = "kontor@kontor.dk"
                 }
             );
 
@@ -72,9 +76,7 @@ namespace Hovedopgave.Data
                     Description = "Ticket 1",
                     Priority = 1
                 }
-                );
-
-
+            );
         }
     }
 }

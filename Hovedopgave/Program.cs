@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Hovedopgave.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Hovedopgave.Services;
+
 namespace Hovedopgave
 {
     public class Program
@@ -10,15 +11,26 @@ namespace Hovedopgave
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddDbContext<HovedopgaveContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("HovedopgaveContext") ?? throw new InvalidOperationException("Connection string 'HovedopgaveContext' not found.")));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("HovedopgaveContext")
+                    ?? throw new InvalidOperationException("Connection string 'HovedopgaveContext' not found.")));
 
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
             {
-                // set Cookie expiration time
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
             });
+
+            // Read SMTP
+            var smtpSettings = builder.Configuration.GetSection("SmtpSettings");
+            var host = smtpSettings["Host"];
+            var port = int.Parse(smtpSettings["Port"]);
+            var enableSsl = bool.Parse(smtpSettings["EnableSsl"]);
+            var username = smtpSettings["Username"];
+            var password = smtpSettings["Password"];
+            var fromAddress = smtpSettings["FromAddress"];
+
+            builder.Services.AddSingleton(new NotificationMailer(host, port, fromAddress, username, password, enableSsl));
 
             var app = builder.Build();
 
@@ -34,7 +46,6 @@ namespace Hovedopgave
             app.UseRouting();
 
             app.UseAuthentication();
-
             app.UseAuthorization();
 
             app.MapControllerRoute(

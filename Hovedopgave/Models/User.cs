@@ -19,6 +19,12 @@ namespace Hovedopgave.Models
         public string Password { get; set; }
         [DisplayName("Rolle")]
         public string Role { get; set; }
+
+        [DisplayName("Email")]
+        [Required(ErrorMessage = "Email er påkrævet")]
+        [EmailAddress(ErrorMessage = "Ugyldig email-adresse")]
+        public string Email { get; set; }
+
         public ICollection<Ticket> Tickets { get; set; }
 
         public User()
