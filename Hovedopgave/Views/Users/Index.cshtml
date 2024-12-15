@@ -17,6 +17,7 @@
             <th>@Html.DisplayNameFor(model => model.Role)</th>
             <th>@Html.DisplayNameFor(model => model.Initials)</th>
             <th>@Html.DisplayNameFor(model => model.FullName)</th>
+            <th>@Html.DisplayNameFor(model => model.Email)</th>
             <th>Muligheder</th>
         </tr>
     </thead>
@@ -29,6 +30,7 @@
                 <td>@Html.DisplayFor(modelItem => item.Role)</td>
                 <td>@Html.DisplayFor(modelItem => item.Initials)</td>
                 <td>@Html.DisplayFor(modelItem => item.FullName)</td>
+                <td>@Html.DisplayFor(modelItem => item.Email)</td>
                 <td>
                     <div class="d-flex">
                         <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary me-2">Rediger</a>
