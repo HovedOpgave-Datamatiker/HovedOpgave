@@ -14,6 +14,7 @@ namespace Hovedopgave.Data
         public DbSet<Hovedopgave.Models.User> User { get; set; } = default!;
         public DbSet<Hovedopgave.Models.NotificationSetting> NotificationSetting { get; set; }
         public DbSet<Hovedopgave.Models.Station> Station { get; set; } = default!;
+        public DbSet<Hovedopgave.Models.Comment> Comments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

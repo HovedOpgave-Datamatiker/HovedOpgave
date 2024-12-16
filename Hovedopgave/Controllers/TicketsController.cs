@@ -5,6 +5,7 @@ using Hovedopgave.Data;
 using Hovedopgave.Models;
 using Microsoft.AspNetCore.Authorization;
 using Hovedopgave.Services;
+using System.Diagnostics;
 
 namespace Hovedopgave.Controllers
 {
@@ -77,6 +78,7 @@ namespace Hovedopgave.Controllers
             var ticket = await _context.Ticket
                 .Include(t => t.Users)
                 .Include(t => t.Station)
+                .Include(t => t.Comments)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (ticket == null)
             {
@@ -87,6 +89,39 @@ namespace Hovedopgave.Controllers
             TempData["Return"] = "Index";
 
             return View(ticket);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddComment(int id, string comment)
+        {
+
+            if (string.IsNullOrWhiteSpace(comment))
+            {
+                ModelState.AddModelError("Comment", "Kommentar kan ikke være tom.");
+                return RedirectToAction("Details", new {id});
+            }
+
+
+            var newComment = new Comment
+            {
+                TicketId = id,
+                Created = DateTime.Now,
+                CreatedBy = User.Identity.Name,
+                Text = comment
+            };
+
+            var ticket = await _context.Ticket.FindAsync(id);
+            if (ticket == null)
+            {
+                return NotFound();
+            }
+            ticket.LastUpdated = DateTime.Now;
+            _context.Update(ticket);
+
+            _context.Comments.Add(newComment);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         // GET: Tickets/Create

@@ -41,7 +41,7 @@ namespace Hovedopgave.Controllers
                 setting = new NotificationSetting
                 {
                     UserId = currentUser.Id,
-                    EmailNotificationsEnabled = false,
+                    EmailNotificationsEnabled = true,
                     Frequency = NotificationFrequency.Always
                 };
                 _context.NotificationSetting.Add(setting);

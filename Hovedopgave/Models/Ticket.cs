@@ -34,12 +34,15 @@ namespace Hovedopgave.Models
 
         public ICollection<User> Users { get; set; }
 
+        public ICollection<Comment> Comments { get; set; }
+
         public Ticket()
         {
             IsFinished = false;
             Created = DateTime.Now;
             LastUpdated = DateTime.Now;
             Users = new List<User>();
+            Comments = new List<Comment>();
         }
 
         [NotMapped]

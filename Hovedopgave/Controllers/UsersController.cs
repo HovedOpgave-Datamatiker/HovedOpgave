@@ -52,6 +52,19 @@ namespace Hovedopgave.Controllers
             if (ModelState.IsValid)
             {
                 _context.Add(user);
+
+                _context.SaveChanges();
+
+                var newUser = await _context.User
+               .FirstOrDefaultAsync(u => u.Username == user.Username);
+
+                var setting = new NotificationSetting
+                {
+                    UserId = newUser.Id,
+                    EmailNotificationsEnabled = true,
+                    Frequency = NotificationFrequency.Always
+                };
+                _context.NotificationSetting.Add(setting);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
