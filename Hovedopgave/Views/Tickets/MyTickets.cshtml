@@ -38,7 +38,7 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
+            <tr onclick="window.location.href='@Url.Action("Details","Tickets", new { id = item.Id })'" style="cursor:pointer">
                 <td>
                     @(item.IsFinished ? "Lukket" : "Åben")
                 </td>
