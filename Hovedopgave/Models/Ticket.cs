@@ -27,6 +27,11 @@ namespace Hovedopgave.Models
         [ForeignKey("User")]
         public int? UserId { get; set; }
 
+        [ForeignKey("Station")]
+        public int? StationId { get; set; }
+
+        public Station? Station { get; set; }
+
         public ICollection<User> Users { get; set; }
 
         public Ticket()
