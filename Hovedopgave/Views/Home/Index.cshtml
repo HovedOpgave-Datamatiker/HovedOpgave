@@ -4,7 +4,7 @@
     ViewData["Title"] = "Mine Tildelte Tickets";
 }
 
-<h1>Hjem // Mine Tildelte Tickets</h1>
+<h1>Mine Sager</h1>
 
 <p>
     <button class="btn btn-primary" onclick="window.location.href = '/Tickets/Create'">Opret ny</button>
@@ -33,12 +33,12 @@
                 <td>@item.LastUpdated.ToString("dd-MM-yyyy HH:mm")</td>
                 <td>
                     <div class="d-flex">
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary me-2">Rediger</a>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-secondary me-2">Rediger</a>
                         <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-primary">Slet</a>
                     </div>
                 </td>
                 <td>
-                    <a asp-action="ChangeStatus" asp-route-id="@item.Id" class="btn btn-primary">Ændre status</a>
+                    <a asp-action="ChangeStatus" asp-route-id="@item.Id" class="btn btn-outline-danger">Ændre status</a>
                 </td>
             </tr>
         }

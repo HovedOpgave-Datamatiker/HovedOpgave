@@ -63,12 +63,12 @@
                 </td>
                 <td>
                     <div class="d-flex">
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary me-2">Rediger</a>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-secondary me-2">Rediger</a>
                         <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-primary">Slet</a>
                     </div>
                 </td>
                 <td>
-                    <a asp-action="ChangeStatus" asp-route-id="@item.Id" class="btn btn-primary">Ændre status</a>
+                    <a asp-action="ChangeStatus" asp-route-id="@item.Id" class="btn btn-outline-danger">Ændre status</a>
                 </td>
             </tr>
         }

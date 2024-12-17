@@ -155,6 +155,8 @@ namespace Hovedopgave.Controllers
                 //    }
                 //}
 
+                ticket.CreatedBy = User.Identity.Name;
+                ticket.LastUpdatedBy = User.Identity.Name;
                 _context.Add(ticket);
                 await _context.SaveChangesAsync();
 
@@ -224,7 +226,7 @@ namespace Hovedopgave.Controllers
                     ticketToUpdate.Description = ticket.Description;
                     ticketToUpdate.Priority = ticket.Priority;
                     ticketToUpdate.LastUpdated = DateTime.Now;
-                    ticketToUpdate.CreatedBy = User.Identity.Name;
+                    ticketToUpdate.LastUpdatedBy = User.Identity.Name;
 
                     ticketToUpdate.Users.Clear();
                     if (ticket.SelectedUserIds != null)
