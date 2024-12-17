@@ -116,6 +116,7 @@ namespace Hovedopgave.Controllers
                 return NotFound();
             }
             ticket.LastUpdated = DateTime.Now;
+            ticket.LastUpdatedBy = User.Identity.Name;
             _context.Update(ticket);
 
             _context.Comments.Add(newComment);
