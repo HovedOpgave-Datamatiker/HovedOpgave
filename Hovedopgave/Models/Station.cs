@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Hovedopgave.Models
 {
@@ -14,6 +15,6 @@ namespace Hovedopgave.Models
         [DisplayName("Noter")]
         public string Notes { get; set; }
 
-        public ICollection<Ticket> Tickets { get; set; }
+        public ICollection<Ticket>? Tickets { get; set; }
     }
 }
