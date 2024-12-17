@@ -47,11 +47,24 @@ namespace Hovedopgave.Controllers
         // POST: Users/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Username,Password,Role")] User user)
+        public async Task<IActionResult> Create([Bind("Id,Username,Password,Role,Email,Initials,FullName")] User user)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(user);
+
+                _context.SaveChanges();
+
+                var newUser = await _context.User
+               .FirstOrDefaultAsync(u => u.Username == user.Username);
+
+                var setting = new NotificationSetting
+                {
+                    UserId = newUser.Id,
+                    EmailNotificationsEnabled = true,
+                    Frequency = NotificationFrequency.Always
+                };
+                _context.NotificationSetting.Add(setting);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -77,7 +90,7 @@ namespace Hovedopgave.Controllers
         // POST: Users/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Username,Password,Role")] User user)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Username,Password,Role,Email,Initials,FullName")] User user)
         {
             if (id != user.Id)
             {
@@ -93,7 +106,7 @@ namespace Hovedopgave.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!UserExists(user.Id))
+                    if (!_context.User.Any(e => e.Id == user.Id))
                     {
                         return NotFound();
                     }
@@ -138,11 +151,6 @@ namespace Hovedopgave.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool UserExists(int id)
-        {
-            return _context.User.Any(e => e.Id == id);
         }
     }
 }

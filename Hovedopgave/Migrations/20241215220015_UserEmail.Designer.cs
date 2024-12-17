@@ -4,6 +4,7 @@ using Hovedopgave.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hovedopgave.Migrations
 {
     [DbContext(typeof(HovedopgaveContext))]
-    partial class HovedopgaveContextModelSnapshot : ModelSnapshot
+    [Migration("20241215220015_UserEmail")]
+    partial class UserEmail
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,34 +24,6 @@ namespace Hovedopgave.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("Hovedopgave.Models.Comment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("TicketId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TicketId");
-
-                    b.ToTable("Comments");
-                });
 
             modelBuilder.Entity("Hovedopgave.Models.NotificationSetting", b =>
                 {
@@ -149,15 +124,10 @@ namespace Hovedopgave.Migrations
                     b.Property<int>("Priority")
                         .HasColumnType("int");
 
-                    b.Property<int?>("StationId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("StationId");
 
                     b.ToTable("Ticket");
 
@@ -165,10 +135,10 @@ namespace Hovedopgave.Migrations
                         new
                         {
                             Id = 1,
-                            Created = new DateTime(2024, 12, 16, 19, 40, 45, 647, DateTimeKind.Local).AddTicks(6587),
+                            Created = new DateTime(2024, 12, 15, 23, 0, 14, 345, DateTimeKind.Local).AddTicks(9816),
                             Description = "Ticket 1",
                             IsFinished = false,
-                            LastUpdated = new DateTime(2024, 12, 16, 19, 40, 45, 647, DateTimeKind.Local).AddTicks(6638),
+                            LastUpdated = new DateTime(2024, 12, 15, 23, 0, 14, 345, DateTimeKind.Local).AddTicks(9878),
                             Priority = 1
                         });
                 });
@@ -266,17 +236,6 @@ namespace Hovedopgave.Migrations
                     b.ToTable("TicketUser", (string)null);
                 });
 
-            modelBuilder.Entity("Hovedopgave.Models.Comment", b =>
-                {
-                    b.HasOne("Hovedopgave.Models.Ticket", "Ticket")
-                        .WithMany("Comments")
-                        .HasForeignKey("TicketId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Ticket");
-                });
-
             modelBuilder.Entity("Hovedopgave.Models.NotificationSetting", b =>
                 {
                     b.HasOne("Hovedopgave.Models.User", "User")
@@ -286,15 +245,6 @@ namespace Hovedopgave.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Hovedopgave.Models.Ticket", b =>
-                {
-                    b.HasOne("Hovedopgave.Models.Station", "Station")
-                        .WithMany("Tickets")
-                        .HasForeignKey("StationId");
-
-                    b.Navigation("Station");
                 });
 
             modelBuilder.Entity("TicketUser", b =>
@@ -310,16 +260,6 @@ namespace Hovedopgave.Migrations
                         .HasForeignKey("UsersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Hovedopgave.Models.Station", b =>
-                {
-                    b.Navigation("Tickets");
-                });
-
-            modelBuilder.Entity("Hovedopgave.Models.Ticket", b =>
-                {
-                    b.Navigation("Comments");
                 });
 #pragma warning restore 612, 618
         }

@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Hovedopgave.Data;
 using Hovedopgave.Models;
 using Microsoft.AspNetCore.Authorization;
+using Hovedopgave.Services;
+using System.Diagnostics;
 
 namespace Hovedopgave.Controllers
 {
@@ -11,10 +13,12 @@ namespace Hovedopgave.Controllers
     public class TicketsController : Controller
     {
         private readonly HovedopgaveContext _context;
+        private readonly NotificationMailer _mailer;
 
-        public TicketsController(HovedopgaveContext context)
+        public TicketsController(HovedopgaveContext context, NotificationMailer mailer)
         {
             _context = context;
+            _mailer = mailer;
         }
 
         //GET: User Tickets
@@ -22,9 +26,16 @@ namespace Hovedopgave.Controllers
         {
             TempData["Return"] = "MyTickets";
 
-            int currentUserId = _context.User.Where(U => U.Username == User.Identity.Name).FirstOrDefault().Id;
+            int currentUserId = _context.User
+                .Where(u => u.Username == User.Identity.Name)
+                .Select(u => u.Id)
+                .FirstOrDefault();
 
-            return View(await _context.Ticket.Where(t => t.UserId == currentUserId).ToListAsync());
+            return View(await _context.Ticket
+                .Include(t => t.Station)
+                .Include(t => t.Users)
+                .Where(t => t.Users.Any(u => u.Id == currentUserId))
+                .ToListAsync());
         }
 
         // GET: Open Tickets
@@ -32,14 +43,17 @@ namespace Hovedopgave.Controllers
         {
             TempData["Return"] = "Index";
 
-            return View(await _context.Ticket.Where(t => t.IsFinished == false).OrderByDescending(t => t.Priority).ToListAsync());
+            return View(await _context.Ticket
+                .Include(t => t.Station)
+                .Where(t => t.IsFinished == false)
+                .OrderByDescending(t => t.Priority)
+                .ToListAsync());
         }
 
         // GET: All Tickets
         public async Task<IActionResult> OpenTickets()
         {
             TempData["Return"] = "Index";
-
             return View(await _context.Ticket.ToListAsync());
         }
 
@@ -47,7 +61,10 @@ namespace Hovedopgave.Controllers
         public async Task<IActionResult> ClosedTickets()
         {
             TempData["Return"] = "ClosedTickets";
-            return View(await _context.Ticket.Where(t => t.IsFinished == true).ToListAsync());
+            return View(await _context.Ticket
+                .Include(t => t.Station)
+                .Where(t => t.IsFinished == true)
+                .ToListAsync());
         }
 
         // GET: Tickets/Details/5
@@ -60,25 +77,58 @@ namespace Hovedopgave.Controllers
 
             var ticket = await _context.Ticket
                 .Include(t => t.Users)
+                .Include(t => t.Station)
+                .Include(t => t.Comments)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (ticket == null)
             {
                 return NotFound();
             }
 
-
             ViewBag.Return = TempData["Return"];
-
             TempData["Return"] = "Index";
 
-
             return View(ticket);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddComment(int id, string comment)
+        {
+
+            if (string.IsNullOrWhiteSpace(comment))
+            {
+                ModelState.AddModelError("Comment", "Kommentar kan ikke være tom.");
+                return RedirectToAction("Details", new {id});
+            }
+
+
+            var newComment = new Comment
+            {
+                TicketId = id,
+                Created = DateTime.Now,
+                CreatedBy = User.Identity.Name,
+                Text = comment
+            };
+
+            var ticket = await _context.Ticket.FindAsync(id);
+            if (ticket == null)
+            {
+                return NotFound();
+            }
+            ticket.LastUpdated = DateTime.Now;
+            ticket.LastUpdatedBy = User.Identity.Name;
+            _context.Update(ticket);
+
+            _context.Comments.Add(newComment);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         // GET: Tickets/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Ticket ticket, int[] selectedUserIds)
+        public async Task<IActionResult> Create(Ticket ticket, int[] selectedUserIds, int selectedStationId)
         {
             if (ModelState.IsValid)
             {
@@ -90,12 +140,30 @@ namespace Hovedopgave.Controllers
                         if (user != null)
                         {
                             ticket.Users.Add(user);
+                            //ticket.UserId = userId;
                         }
                     }
                 }
 
+                
+
+                //if(selectedStationId != null)
+                //{
+                //    var station = await _context.Station.FindAsync(selectedStationId);
+                //    if(station != null)
+                //    {
+                //        ticket.Station = await _context.Station.FindAsync(ticket.StationId);
+                //    }
+                //}
+
+                ticket.CreatedBy = User.Identity.Name;
+                ticket.LastUpdatedBy = User.Identity.Name;
                 _context.Add(ticket);
                 await _context.SaveChangesAsync();
+
+                // Notify Users
+                await NotifyUsersAboutTicketCreation(ticket);
+
                 return RedirectToAction(nameof(Index));
             }
 
@@ -106,6 +174,7 @@ namespace Hovedopgave.Controllers
         public IActionResult Create()
         {
             ViewBag.Users = new SelectList(_context.User, "Id", "FullName");
+            ViewBag.Stations = new SelectList(_context.Station, "Id", "Name");
             return View();
         }
 
@@ -158,7 +227,7 @@ namespace Hovedopgave.Controllers
                     ticketToUpdate.Description = ticket.Description;
                     ticketToUpdate.Priority = ticket.Priority;
                     ticketToUpdate.LastUpdated = DateTime.Now;
-                    ticketToUpdate.CreatedBy = User.Identity.Name;
+                    ticketToUpdate.LastUpdatedBy = User.Identity.Name;
 
                     ticketToUpdate.Users.Clear();
                     if (ticket.SelectedUserIds != null)
@@ -175,6 +244,9 @@ namespace Hovedopgave.Controllers
 
                     _context.Update(ticketToUpdate);
                     await _context.SaveChangesAsync();
+
+                    // Notify users update
+                    await NotifyUsersAboutTicketUpdate(ticketToUpdate);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -237,19 +309,46 @@ namespace Hovedopgave.Controllers
             var ticket = await _context.Ticket.FindAsync(id);
             if (ticket != null)
             {
-                if (ticket.IsFinished)
-                {
-                    ticket.IsFinished = false;
-                }
-                else
-                {
-                    ticket.IsFinished = true;
-                }
+                ticket.IsFinished = !ticket.IsFinished;
                 ticket.LastUpdated = DateTime.Now;
                 _context.Update(ticket);
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
+        }
+
+        private async Task NotifyUsersAboutTicketCreation(Ticket ticket)
+        {
+            _mailer.ClearRecipients();
+
+            var assignedUsers = ticket.Users.ToList();
+            foreach (var user in assignedUsers)
+            {
+                var setting = await _context.NotificationSetting.FirstOrDefaultAsync(n => n.UserId == user.Id);
+                if (setting != null && setting.EmailNotificationsEnabled && setting.Frequency == NotificationFrequency.Always)
+                {
+                    _mailer.AddRecipient(user.Email);
+                }
+            }
+
+            _mailer.SendTicketCreatedNotification(ticket);
+        }
+
+        private async Task NotifyUsersAboutTicketUpdate(Ticket ticket)
+        {
+            _mailer.ClearRecipients();
+
+            var assignedUsers = ticket.Users.ToList();
+            foreach (var user in assignedUsers)
+            {
+                var setting = await _context.NotificationSetting.FirstOrDefaultAsync(n => n.UserId == user.Id);
+                if (setting != null && setting.EmailNotificationsEnabled && setting.Frequency == NotificationFrequency.Always)
+                {
+                    _mailer.AddRecipient(user.Email);
+                }
+            }
+
+            _mailer.SendTicketUpdatedNotification(ticket);
         }
     }
 }

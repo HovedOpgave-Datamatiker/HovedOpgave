@@ -27,7 +27,14 @@ namespace Hovedopgave.Models
         [ForeignKey("User")]
         public int? UserId { get; set; }
 
+        [ForeignKey("Station")]
+        public int? StationId { get; set; }
+
+        public Station? Station { get; set; }
+
         public ICollection<User> Users { get; set; }
+
+        public ICollection<Comment> Comments { get; set; }
 
         public Ticket()
         {
@@ -35,6 +42,7 @@ namespace Hovedopgave.Models
             Created = DateTime.Now;
             LastUpdated = DateTime.Now;
             Users = new List<User>();
+            Comments = new List<Comment>();
         }
 
         [NotMapped]

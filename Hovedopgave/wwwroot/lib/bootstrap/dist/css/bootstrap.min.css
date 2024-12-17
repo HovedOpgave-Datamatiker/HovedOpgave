@@ -6,6 +6,7 @@
  */
 
 :root {
+    --main-darkred: #CF2A1E;
     --main-white: #f3f3f3;
     --main-red: #cf4b38;
     --main-grey: #939da8;
@@ -2966,7 +2967,7 @@ textarea.form-control-lg {
 
     .btn-primary:hover {
         color: #fff;
-        background-color: var(--main-grey);
+        background-color: var(--main-darkred);
         border-color: var(--main-dark-blue);
     }
 

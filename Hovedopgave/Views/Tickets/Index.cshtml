@@ -9,9 +9,12 @@
 <p>
     <button class="btn btn-primary" onclick="window.location.href = '/Tickets/Create'">Opret ny</button>
 </p>
-<table class="table">
+<table class="table table-striped table-hover">
     <thead>
         <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Station.Name)
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.IsFinished)
             </th>
@@ -38,7 +41,10 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
+            <tr onclick="window.location.href='@Url.Action("Details","Tickets", new { id = item.Id })'" style="cursor:pointer">
+                <td>
+                    @Html.DisplayFor(modelItem => item.Station.Name)
+                </td>
                 <td>
                     @(item.IsFinished ? "Lukket" : "Åben")
                 </td>
@@ -56,19 +62,15 @@
                     @Html.DisplayFor(modelItem => item.LastUpdated)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Rediger</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Detaljer</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Slet</a>
+                    <div class="d-flex">
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-secondary me-2">Rediger</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-primary">Slet</a>
+                    </div>
                 </td>
                 <td>
-                    <a asp-action="ChangeStatus" asp-route-id="@item.Id">
-                        <button class="btn btn-secondary">Ændre status</button>
-                    </a>
+                    <a asp-action="ChangeStatus" asp-route-id="@item.Id" class="btn btn-outline-danger">Ændre status</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
-
-
-

@@ -45,7 +45,7 @@ namespace Hovedopgave.Controllers
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
-                    return RedirectToAction("SecurePage");
+                    return RedirectToAction("Index", "Tickets");
                 }
                 else
                 {
@@ -58,7 +58,7 @@ namespace Hovedopgave.Controllers
         public IActionResult Logout()
         {
             HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Index");
+            return RedirectToAction("Login");
         }
 
         [Authorize]

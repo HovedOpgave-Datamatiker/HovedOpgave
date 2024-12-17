@@ -5,10 +5,16 @@
 }
 
 <h1>Sagens detaljer</h1>
-
+<div>
 <div>
     <hr />
     <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Station.Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Station.Name)
+        </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Description)
         </dt>
@@ -37,7 +43,7 @@
             @Html.DisplayNameFor(model => model.Priority)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Priority)
+                @Html.DisplayFor(model => model.PriorityDescription)
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.CreatedBy)
@@ -65,6 +71,33 @@
         </dd>
     </dl>
 </div>
+<div>
+    <h2>Kommentarer</h2>
+    @foreach (var Comment in Model.Comments)
+    {
+        <div class="card" style="width: 50%; border: solid black 2px">
+            <div class="card-header" style="border-bottom: 1px solid darkgrey">
+                @Comment.CreatedBy
+            </div>
+            <div class="card-body">
+                <p class="card-text">@Comment.Text</p>
+            </div>
+                <div class="card-footer text-muted" style="border-top: 1px solid darkgrey">
+                @Comment.Created.ToString("dd/MM-yyyy HH:mm")
+            </div>
+        </div>
+            <br />
+    }
+    
+
+        <form asp-action="AddComment" asp-route-id="@Model?.Id" method="post">
+    <textarea name="comment" class="form-control" rows="2" placeholder="Write..." style="width: 50%; resize:none;"></textarea>
+    <br />
+    <button type="submit" class="btn btn-primary">Tilføj Kommentar</button>
+        </form>
+</div>
+</div>
+<br />
 <div>
     <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model?.Id">Rediger</a>
     <a class="btn btn-secondary" asp-action=@ViewBag.Return>Tilbage til liste</a>

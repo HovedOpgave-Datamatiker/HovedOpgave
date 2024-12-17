@@ -53,6 +53,9 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Notifications" asp-action="Edit">Notifikationer</a> 
+                            </li>
+                            <li>
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">Log ud</a>
                             </li>
                         }
