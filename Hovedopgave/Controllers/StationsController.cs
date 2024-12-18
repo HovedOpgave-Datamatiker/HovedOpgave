@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Hovedopgave.Data;
 using Hovedopgave.Models;
 using Microsoft.AspNetCore.Authorization;
+using log4net;
 
 namespace Hovedopgave.Controllers
 {
@@ -10,6 +11,9 @@ namespace Hovedopgave.Controllers
     public class StationsController : Controller
     {
         private readonly HovedopgaveContext _context;
+
+        // create a static logger field
+        private static ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public StationsController(HovedopgaveContext context)
         {
@@ -43,6 +47,7 @@ namespace Hovedopgave.Controllers
         // GET: Stations/Create
         public IActionResult Create()
         {
+            logger.Info("Logger Test");
             return View();
         }
 
@@ -55,8 +60,10 @@ namespace Hovedopgave.Controllers
             {
                 _context.Add(station);
                 await _context.SaveChangesAsync();
+                logger.Info("Station created");
                 return RedirectToAction(nameof(Index));
             }
+            logger.Info("Station not valid");
             return View(station);
         }
 
@@ -65,6 +72,7 @@ namespace Hovedopgave.Controllers
         {
             if (id == null)
             {
+                logger.Error("Id not found");
                 return NotFound();
             }
 
