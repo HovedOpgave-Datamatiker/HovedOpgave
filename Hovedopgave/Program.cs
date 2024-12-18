@@ -3,10 +3,14 @@ using Hovedopgave.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Hovedopgave.Services;
 
+[assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config")]
+
 namespace Hovedopgave
 {
     public class Program
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
