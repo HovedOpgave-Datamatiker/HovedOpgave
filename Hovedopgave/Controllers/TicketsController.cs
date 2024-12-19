@@ -6,6 +6,7 @@ using Hovedopgave.Models;
 using Microsoft.AspNetCore.Authorization;
 using Hovedopgave.Services;
 using System.Diagnostics;
+using log4net; 
 
 namespace Hovedopgave.Controllers
 {
@@ -14,6 +15,7 @@ namespace Hovedopgave.Controllers
     {
         private readonly HovedopgaveContext _context;
         private readonly NotificationMailer _mailer;
+        private static ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType); 
 
         public TicketsController(HovedopgaveContext context, NotificationMailer mailer)
         {
@@ -98,7 +100,7 @@ namespace Hovedopgave.Controllers
             if (string.IsNullOrWhiteSpace(comment))
             {
                 ModelState.AddModelError("Comment", "Kommentar kan ikke være tom.");
-                return RedirectToAction("Details", new {id});
+                return RedirectToAction("Details", new { id });
             }
 
 
@@ -113,6 +115,7 @@ namespace Hovedopgave.Controllers
             var ticket = await _context.Ticket.FindAsync(id);
             if (ticket == null)
             {
+                logger.Warn($"AddComment failed: No ticket found with id={id}"); 
                 return NotFound();
             }
             ticket.LastUpdated = DateTime.Now;
@@ -145,7 +148,7 @@ namespace Hovedopgave.Controllers
                     }
                 }
 
-                
+
 
                 //if(selectedStationId != null)
                 //{
@@ -160,6 +163,7 @@ namespace Hovedopgave.Controllers
                 ticket.LastUpdatedBy = User.Identity.Name;
                 _context.Add(ticket);
                 await _context.SaveChangesAsync();
+                logger.Info($"Ticket {ticket.Id} created by {User.Identity.Name}"); 
 
                 // Notify Users
                 await NotifyUsersAboutTicketCreation(ticket);
@@ -221,6 +225,7 @@ namespace Hovedopgave.Controllers
 
                     if (ticketToUpdate == null)
                     {
+                        logger.Warn($"Edit failed: No ticket found with id={ticket.Id}"); 
                         return NotFound();
                     }
 
@@ -244,6 +249,7 @@ namespace Hovedopgave.Controllers
 
                     _context.Update(ticketToUpdate);
                     await _context.SaveChangesAsync();
+                    logger.Info($"Ticket {ticket.Id} updated by {User.Identity.Name}"); 
 
                     // Notify users update
                     await NotifyUsersAboutTicketUpdate(ticketToUpdate);
@@ -296,6 +302,7 @@ namespace Hovedopgave.Controllers
             }
 
             await _context.SaveChangesAsync();
+            logger.Info($"Ticket {id} deleted by {User.Identity.Name}"); 
             return RedirectToAction(nameof(Index));
         }
 
@@ -313,6 +320,7 @@ namespace Hovedopgave.Controllers
                 ticket.LastUpdated = DateTime.Now;
                 _context.Update(ticket);
                 await _context.SaveChangesAsync();
+                logger.Info($"Ticket {id} status changed by {User.Identity.Name}"); 
             }
             return RedirectToAction(nameof(Index));
         }

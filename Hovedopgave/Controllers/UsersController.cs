@@ -2,12 +2,14 @@
 using Microsoft.EntityFrameworkCore;
 using Hovedopgave.Data;
 using Hovedopgave.Models;
+using log4net;
 
 namespace Hovedopgave.Controllers
 {
     public class UsersController : Controller
     {
         private readonly HovedopgaveContext _context;
+        private static ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public UsersController(HovedopgaveContext context)
         {
@@ -52,11 +54,10 @@ namespace Hovedopgave.Controllers
             if (ModelState.IsValid)
             {
                 _context.Add(user);
-
                 _context.SaveChanges();
 
                 var newUser = await _context.User
-               .FirstOrDefaultAsync(u => u.Username == user.Username);
+                    .FirstOrDefaultAsync(u => u.Username == user.Username);
 
                 var setting = new NotificationSetting
                 {
@@ -66,6 +67,7 @@ namespace Hovedopgave.Controllers
                 };
                 _context.NotificationSetting.Add(setting);
                 await _context.SaveChangesAsync();
+                logger.Info($"User '{user.Username}' created with ID {newUser.Id}");
                 return RedirectToAction(nameof(Index));
             }
             return View(user);
@@ -103,6 +105,7 @@ namespace Hovedopgave.Controllers
                 {
                     _context.Update(user);
                     await _context.SaveChangesAsync();
+                    logger.Info($"User {user.Id} updated");
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -147,9 +150,10 @@ namespace Hovedopgave.Controllers
             if (user != null)
             {
                 _context.User.Remove(user);
+                await _context.SaveChangesAsync();
+                logger.Info($"User {id} deleted");
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
     }

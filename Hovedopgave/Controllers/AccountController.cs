@@ -5,12 +5,14 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using log4net;
 
 namespace Hovedopgave.Controllers
 {
     public class AccountController : Controller
     {
         private readonly HovedopgaveContext _context;
+        private static ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public AccountController(HovedopgaveContext context)
         {
@@ -35,13 +37,12 @@ namespace Hovedopgave.Controllers
                 var user = _context.User.FirstOrDefault(u => u.Username == model.Username && u.Password == model.Password);
                 if (user != null)
                 {
+                    logger.Info($"User '{user.Username}' logged in successfully");
                     var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.Username),
-                
-                new Claim(ClaimTypes.Role, user.Role),
-                
-            };
+                    {
+                        new Claim(ClaimTypes.Name, user.Username),
+                        new Claim(ClaimTypes.Role, user.Role),
+                    };
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
@@ -49,6 +50,7 @@ namespace Hovedopgave.Controllers
                 }
                 else
                 {
+                    logger.Warn($"Invalid login attempt for username '{model.Username}'");
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                 }
             }
@@ -57,6 +59,10 @@ namespace Hovedopgave.Controllers
 
         public IActionResult Logout()
         {
+            if (User?.Identity?.Name != null)
+            {
+                logger.Info($"User '{User.Identity.Name}' logged out");
+            }
             HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login");
         }
@@ -64,8 +70,6 @@ namespace Hovedopgave.Controllers
         [Authorize]
         public IActionResult SecurePage()
         {
-            ViewBag.Username = HttpContext.User.Identity.Name;
-            ViewBag.Role = HttpContext.User.Claims.FirstOrDefault(c => c.Type == string.Empty)?.Value;
             return View();
         }
     }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
+using log4net;
 
 namespace Hovedopgave.Controllers
 {
@@ -12,6 +13,9 @@ namespace Hovedopgave.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly HovedopgaveContext _context;
+
+        // Add log4net logger
+        private static ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public HomeController(ILogger<HomeController> logger, HovedopgaveContext context)
         {
@@ -29,6 +33,7 @@ namespace Hovedopgave.Controllers
             var username = User.Identity?.Name;
             if (string.IsNullOrEmpty(username))
             {
+                logger.Warn("Home: No username found, returning Unauthorized");
                 return Unauthorized();
             }
 
@@ -37,21 +42,25 @@ namespace Hovedopgave.Controllers
 
             if (currentUser == null)
             {
+                logger.Warn($"Home: No user found for username '{username}', returning Unauthorized");
                 return Unauthorized();
             }
 
+            logger.Info($"Home: Found user '{username}', fetching assigned tickets");
             var assignedTickets = await _context.Ticket
                 .Where(t => t.Users.Any(u => u.Id == currentUser.Id))
                 .Include(t => t.Users)
                 .OrderByDescending(t => t.Priority)
                 .ToListAsync();
 
+            logger.Info($"Home: Returning {assignedTickets.Count} tickets for user '{username}'");
             return View(assignedTickets);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
+            logger.Error("Home: Error action called");
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
