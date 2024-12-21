@@ -143,21 +143,10 @@ namespace Hovedopgave.Controllers
                         if (user != null)
                         {
                             ticket.Users.Add(user);
-                            //ticket.UserId = userId;
                         }
                     }
                 }
 
-
-
-                //if(selectedStationId != null)
-                //{
-                //    var station = await _context.Station.FindAsync(selectedStationId);
-                //    if(station != null)
-                //    {
-                //        ticket.Station = await _context.Station.FindAsync(ticket.StationId);
-                //    }
-                //}
 
                 ticket.CreatedBy = User.Identity.Name;
                 ticket.LastUpdatedBy = User.Identity.Name;
