@@ -16,6 +16,7 @@ namespace Hovedopgave.Controllers
         private readonly HovedopgaveContext _context;
         private readonly NotificationMailer _mailer;
         private static ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType); 
+        public static String? Return { get; set; }
 
         public TicketsController(HovedopgaveContext context, NotificationMailer mailer)
         {
@@ -26,7 +27,7 @@ namespace Hovedopgave.Controllers
         //GET: User Tickets
         public async Task<IActionResult> MyTickets()
         {
-            TempData["Return"] = "MyTickets";
+            Return = "MyTickets";
 
             int currentUserId = _context.User
                 .Where(u => u.Username == User.Identity.Name)
@@ -43,7 +44,7 @@ namespace Hovedopgave.Controllers
         // GET: Open Tickets
         public async Task<IActionResult> Index()
         {
-            TempData["Return"] = "Index";
+            Return = "Index";
 
             return View(await _context.Ticket
                 .Include(t => t.Station)
@@ -55,14 +56,14 @@ namespace Hovedopgave.Controllers
         // GET: All Tickets
         public async Task<IActionResult> OpenTickets()
         {
-            TempData["Return"] = "Index";
+            Return = "Index";
             return View(await _context.Ticket.ToListAsync());
         }
 
         // GET: Closed Tickets
         public async Task<IActionResult> ClosedTickets()
         {
-            TempData["Return"] = "ClosedTickets";
+            Return = "ClosedTickets";
             return View(await _context.Ticket
                 .Include(t => t.Station)
                 .Where(t => t.IsFinished == true)
@@ -87,8 +88,7 @@ namespace Hovedopgave.Controllers
                 return NotFound();
             }
 
-            ViewBag.Return = TempData["Return"];
-            TempData["Return"] = "Index";
+            ViewBag.Return = Return;
 
             return View(ticket);
         }
@@ -125,6 +125,7 @@ namespace Hovedopgave.Controllers
             _context.Comments.Add(newComment);
             await _context.SaveChangesAsync();
 
+            ViewBag.Return = Return;
             return RedirectToAction(nameof(Details), new { id });
         }
 
@@ -157,10 +158,11 @@ namespace Hovedopgave.Controllers
                 // Notify Users
                 await NotifyUsersAboutTicketCreation(ticket);
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(Return);
             }
 
             ViewBag.Users = new SelectList(_context.User, "Id", "FullName");
+            ViewBag.Return = Return;
             return View(ticket);
         }
 
@@ -168,6 +170,7 @@ namespace Hovedopgave.Controllers
         {
             ViewBag.Users = new SelectList(_context.User, "Id", "FullName");
             ViewBag.Stations = new SelectList(_context.Station, "Id", "Name");
+            ViewBag.Return = Return;
             return View();
         }
 
@@ -190,6 +193,9 @@ namespace Hovedopgave.Controllers
 
             ticket.SelectedUserIds = ticket.Users.Select(u => u.Id).ToArray();
             ViewBag.Users = new SelectList(_context.User, "Id", "FullName");
+
+            ViewBag.Return = Return;
+
 
             return View(ticket);
         }
@@ -254,10 +260,11 @@ namespace Hovedopgave.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(Return);
             }
 
             ViewBag.Users = new SelectList(_context.User, "Id", "FullName");
+            ViewBag.Return = Return;
             return View(ticket);
         }
 
@@ -276,6 +283,7 @@ namespace Hovedopgave.Controllers
                 return NotFound();
             }
 
+            ViewBag.Return = Return;
             return View(ticket);
         }
 
@@ -292,7 +300,7 @@ namespace Hovedopgave.Controllers
 
             await _context.SaveChangesAsync();
             logger.Info($"Ticket {id} deleted by {User.Identity.Name}"); 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(Return);
         }
 
         private bool TicketExists(int id)

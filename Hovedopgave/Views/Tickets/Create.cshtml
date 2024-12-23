@@ -4,6 +4,31 @@
     ViewData["Title"] = "Opret sag";
 }
 
+<style>
+
+    #myInput {
+        box-sizing: border-box;
+        font-size: 16px;
+        padding: 5px;
+        width: 100%;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+    }
+
+    #mySelect {
+        width: 100%;
+        font-size: 16px;
+        border: 1px solid #ddd;
+        padding: 5px;
+        height: 100px;
+    }
+
+        #mySelect option {
+            display: none; /* Hide options by default */
+            padding: 5px;
+        }
+</style>
+
 <h1>Opret sag</h1>
 
 <hr />
@@ -36,7 +61,10 @@
 
             <div class="form-group">
                 <label class="control-label">Vælg Station</label>
-                <select asp-for="StationId" class="form-control" asp-items="ViewBag.Stations"></select>
+                <div>
+                    <input type="text" placeholder="Search..." id="myInput" onkeyup="filterSelectOptions()">
+                    <select asp-for="StationId" id="mySelect" class="form-control" asp-items="ViewBag.Stations" size="8"></select>
+                </div>
             </div>
 
 
@@ -48,8 +76,35 @@
 </div>
 
 <div>
-    <button style="margin-top: 10px" accesskey="$0" class="btn btn-secondary" onclick="window.location.href = '/Tickets/Index'">Tilbage til liste</button>
+    <a class="btn btn-secondary" asp-action=@ViewBag.Return>Tilbage til liste</a>
 </div>
+
+<script>
+    function filterSelectOptions() {
+      const input = document.getElementById("myInput");
+      const filter = input.value.toUpperCase();
+      const select = document.getElementById("mySelect");
+      const options = select.getElementsByTagName("option");
+
+      let visibleOptionCount = 0;
+
+      for (let i = 0; i < options.length; i++) {
+        const txtValue = options[i].textContent || options[i].innerText;
+        if (filter && txtValue.toUpperCase().indexOf(filter) > -1) {
+          options[i].style.display = "block";
+          visibleOptionCount++;
+        } else {
+          options[i].style.display = "none";
+        }
+      }
+
+      // Show or hide the select box based on whether options are visible
+      select.style.display = visibleOptionCount > 0 ? "" : "none";
+    }
+
+    // Hide the select box initially
+    document.getElementById("mySelect").style.display = "none";
+</script>
 
 @section Scripts {
     @{
