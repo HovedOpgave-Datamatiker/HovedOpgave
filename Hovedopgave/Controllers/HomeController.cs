@@ -55,6 +55,7 @@ namespace Hovedopgave.Controllers
                 .OrderByDescending(t => t.Priority)
                 .ToListAsync();
 
+            TicketsController.Return = "MyTickets";
             logger.Info($"Home: Returning {assignedTickets.Count} tickets for user '{username}'");
             return View(assignedTickets);
         }
