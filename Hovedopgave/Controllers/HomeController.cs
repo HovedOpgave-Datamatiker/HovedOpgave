@@ -49,7 +49,9 @@ namespace Hovedopgave.Controllers
             logger.Info($"Home: Found user '{username}', fetching assigned tickets");
             var assignedTickets = await _context.Ticket
                 .Where(t => t.Users.Any(u => u.Id == currentUser.Id))
+                .Where(t => t.IsFinished == false)
                 .Include(t => t.Users)
+                .Include(t => t.Station)
                 .OrderByDescending(t => t.Priority)
                 .ToListAsync();
 

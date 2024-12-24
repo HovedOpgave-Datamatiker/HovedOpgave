@@ -9,33 +9,32 @@
 <p>
     <button class="btn btn-primary" onclick="window.location.href = '/Tickets/Create'">Opret ny</button>
 </p>
-
-<table class="table table-striped table-hover">
+<table id="sortableTable" class="table table-striped table-hover">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.IsFinished)
-            </th>
-            <th>
+            <th data-sort="string">
                 @Html.DisplayNameFor(model => model.Station.Name)
             </th>
-            <th>
+            <th data-sort="string">
+                @Html.DisplayNameFor(model => model.IsFinished)
+            </th>
+            <th data-sort="string">
                 @Html.DisplayNameFor(model => model.Description)
             </th>
-            <th>
+            <th data-sort="string">
                 @Html.DisplayNameFor(model => model.Priority)
             </th>
-            <th>
+            <th data-sort="dateTime">
                 @Html.DisplayNameFor(model => model.Created)
             </th>
-            <th>
+            <th data-sort="dateTime">
                 @Html.DisplayNameFor(model => model.LastUpdated)
             </th>
             <th>
                 Muligheder
             </th>
             <th>
-                Åben/Luk sag
+                Åben/Luk Sag
             </th>
         </tr>
     </thead>
@@ -44,10 +43,10 @@
         {
             <tr onclick="window.location.href='@Url.Action("Details","Tickets", new { id = item.Id })'" style="cursor:pointer">
                 <td>
-                    @(item.IsFinished ? "Lukket" : "Åben")
+                    @Html.DisplayFor(modelItem => item.Station.Name)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Station.Name)
+                    @(item.IsFinished ? "Lukket" : "Åben")
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Description)
@@ -56,26 +55,87 @@
                     @Html.DisplayFor(modelItem => item.PriorityDescription)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Created)
+                    @item.Created.ToString("yyyy/MM/dd HH:mm")
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.LastUpdated)
+                    @item.LastUpdated.ToString("yyyy/MM/dd HH:mm")
                 </td>
                 <td>
-                <div class="d-flex">
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-secondary me-2">Rediger</a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-primary">Slet</a>
-                </div>
+                    <div class="d-flex">
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-secondary me-2">Rediger</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-primary">Slet</a>
+                    </div>
                 </td>
                 <td>
-                    <a asp-action="ChangeStatus" asp-route-id="@item.Id">
-                        <button class="btn btn-outline-danger">Ændre status</button>
-                    </a>
+                    <a asp-action="ChangeStatus" asp-route-id="@item.Id" class="btn btn-outline-danger">Ændre status</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const table = document.getElementById("sortableTable");
+        const headers = table.querySelectorAll("thead th[data-sort]");
+        const tbody = table.querySelector("tbody");
+
+        // Function to parse a date string
+        const parseDate = (dateTimeString) => {
+            return new Date(dateTimeString); // Ensure dates are formatted properly in the data
+        };
+
+        headers.forEach((header, index) => {
+            header.addEventListener("click", () => {
+                const sortType = header.getAttribute("data-sort");
+                const rows = Array.from(tbody.rows);
+
+                // Determine the sort order and toggle the class
+                const isAscending = header.classList.contains("asc");
+                headers.forEach(h => h.classList.remove("asc", "desc"));
+                header.classList.toggle("asc", !isAscending);
+                header.classList.toggle("desc", isAscending);
+
+                // Sort the rows based on data type
+                rows.sort((rowA, rowB) => {
+                    const cellA = rowA.cells[index].textContent.trim();
+                    const cellB = rowB.cells[index].textContent.trim();
+
+                    if (sortType === "number") {
+                        return isAscending ? cellB - cellA : cellA - cellB;
+                    } else if (sortType === "date") {
+                        const dateA = parseDate(cellA);
+                        const dateB = parseDate(cellB);
+                        return isAscending ? dateA - dateB : dateB - dateA;
+                    } else {
+                        return isAscending
+                            ? cellB.localeCompare(cellA)
+                            : cellA.localeCompare(cellB);
+                    }
+                });
+
+                // Re-append sorted rows
+                rows.forEach(row => tbody.appendChild(row));
+            });
+        });
+    });
+</script>
+
+<style>
+    th {
+        cursor: pointer;
+        user-select: none;
+    }
+
+        th.asc::after {
+            content: " ▲";
+        }
+
+        th.desc::after {
+            content: " ▼";
+        }
+</style>
+
 
 
 

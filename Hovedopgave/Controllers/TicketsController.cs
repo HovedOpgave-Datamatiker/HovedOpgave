@@ -37,7 +37,9 @@ namespace Hovedopgave.Controllers
             return View(await _context.Ticket
                 .Include(t => t.Station)
                 .Include(t => t.Users)
+                .Where(t => t.IsFinished == false)
                 .Where(t => t.Users.Any(u => u.Id == currentUserId))
+                .OrderByDescending(t => t.Priority)
                 .ToListAsync());
         }
 
@@ -67,6 +69,7 @@ namespace Hovedopgave.Controllers
             return View(await _context.Ticket
                 .Include(t => t.Station)
                 .Where(t => t.IsFinished == true)
+                .OrderByDescending(t => t.Created)
                 .ToListAsync());
         }
 
