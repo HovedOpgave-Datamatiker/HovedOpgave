@@ -2,6 +2,7 @@
 using System.Net.Mail;
 using System.Text;
 using Hovedopgave.Models;
+using log4net;
 
 namespace Hovedopgave.Services
 {
@@ -10,6 +11,8 @@ namespace Hovedopgave.Services
         private readonly SmtpClient _smtpClient;
         private readonly List<MailAddress> _recipients;
         private readonly string _fromAddress;
+        private static ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
 
         public NotificationMailer(string host, int port, string fromAddress, string username, string password, bool enableSsl = true)
         {
@@ -48,6 +51,7 @@ namespace Hovedopgave.Services
             body.AppendLine($"<p><strong>Prioritet:</strong> {ticket.PriorityDescription}</p>");
             body.AppendLine("<p>Du modtager denne email i henhold til dine notifikationsindstillinger.</p>");
 
+            logger.Info("Mail Sent to: " + _recipients.ToString() + " Informing ticket creation");
             SendEmail(subject, body.ToString());
         }
 
@@ -63,6 +67,9 @@ namespace Hovedopgave.Services
             body.AppendLine($"<p><strong>Status:</strong> {(ticket.IsFinished ? "Lukket" : "Åben")}</p>");
             body.AppendLine($"<p><strong>Prioritet:</strong> {ticket.PriorityDescription}</p>");
             body.AppendLine("<p>Du modtager denne email i henhold til dine notifikationsindstillinger.</p>");
+
+            logger.Info("Mail Sent to: " + _recipients.ToString() + " Informing ticket update");
+
 
             SendEmail(subject, body.ToString());
         }
